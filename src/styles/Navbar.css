@@ -1,0 +1,133 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(251, 247, 240, 0.86);
+  border-bottom: 1px solid rgba(47, 111, 98, 0.12);
+  backdrop-filter: blur(16px);
+}
+
+.navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(var(--container-width), calc(100% - 40px));
+  height: 80px;
+  margin: 0 auto;
+}
+
+.navbar-logo {
+  display: grid;
+  gap: 2px;
+}
+
+.navbar-logo h1 {
+  margin: 0;
+  color: var(--accent-green);
+  font-size: 1.12rem;
+  letter-spacing: 0;
+}
+
+.navbar-logo .subtitle {
+  color: var(--terracotta);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+}
+
+.nav-menu a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 12px;
+  color: #3d514d;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  font-weight: 750;
+  transition: var(--transition);
+}
+
+.nav-menu a:hover {
+  color: var(--accent-green);
+  background: rgba(237, 246, 241, 0.9);
+}
+
+.nav-menu .nav-cta {
+  margin-left: 6px;
+  color: var(--light-text);
+  background: var(--accent-green);
+}
+
+.nav-menu .nav-cta:hover {
+  color: var(--light-text);
+  background: var(--primary-green);
+}
+
+.menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: var(--accent-green);
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .navbar-container {
+    width: min(100% - 28px, var(--container-width));
+    height: 72px;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .nav-menu {
+    position: absolute;
+    top: 72px;
+    left: 14px;
+    right: 14px;
+    display: grid;
+    gap: 6px;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.96);
+    border: 0 solid transparent;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    transition: max-height 0.25s ease, padding 0.25s ease, border-width 0.25s ease;
+  }
+
+  .nav-menu.active {
+    max-height: 520px;
+    padding: 10px;
+    border-width: 1px;
+    border-color: var(--border-soft);
+  }
+
+  .nav-menu a {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 14px;
+  }
+
+  .nav-menu .nav-cta {
+    margin-left: 0;
+    justify-content: center;
+  }
+}

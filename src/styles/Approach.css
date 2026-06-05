@@ -1,0 +1,125 @@
+.approach {
+  padding: var(--section-padding) 20px;
+  background:
+    linear-gradient(135deg, rgba(237, 246, 241, 0.92), rgba(251, 247, 240, 0.88));
+}
+
+.approach-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 0.86fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: center;
+  width: min(var(--container-width), 100%);
+  margin: 0 auto;
+}
+
+.approach-content h2 {
+  max-width: 720px;
+  margin-bottom: 18px;
+}
+
+.approach-content > p {
+  max-width: 660px;
+  margin-bottom: 28px;
+  font-size: 1.06rem;
+  line-height: 1.78;
+}
+
+.approach-benefits {
+  display: grid;
+  gap: 12px;
+}
+
+.approach-benefits div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 14px;
+  color: var(--accent-green);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  font-weight: 750;
+}
+
+.approach-benefits svg {
+  flex: 0 0 auto;
+  color: var(--terracotta);
+}
+
+.approach-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.approach-method {
+  padding: 30px;
+  background: var(--accent-green);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+
+.method-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 22px;
+  color: var(--accent-green);
+  background: var(--warm-sand);
+  border-radius: var(--radius);
+}
+
+.approach-method h3 {
+  margin-bottom: 14px;
+  color: #ffffff;
+  font-size: 1.6rem;
+}
+
+.approach-method p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.72;
+}
+
+.approach-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.approach-mini-grid div {
+  display: grid;
+  gap: 6px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+}
+
+.approach-mini-grid svg {
+  color: var(--primary-green);
+}
+
+.approach-mini-grid strong {
+  color: var(--accent-green);
+}
+
+.approach-mini-grid span {
+  color: var(--muted-text);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 920px) {
+  .approach-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .approach-mini-grid {
+    grid-template-columns: 1fr;
+  }
+}

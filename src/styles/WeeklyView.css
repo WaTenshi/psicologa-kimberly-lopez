@@ -1,0 +1,239 @@
+.weekly-view {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.week-navigation {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.week-info {
+  color: #183f38;
+  font-size: 0.98rem;
+  font-weight: 850;
+  text-align: center;
+}
+
+.nav-btn {
+  min-height: 38px;
+  padding: 0 14px;
+  color: #183f38;
+  background: #ffffff;
+  border: 1px solid #dfe8e3;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.nav-btn:hover {
+  background: #edf6f1;
+  border-color: rgba(47, 111, 98, 0.24);
+}
+
+.schedule-table {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #dfe8e3;
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.04);
+}
+
+.schedule-header,
+.time-row {
+  display: grid;
+  grid-template-columns: 76px repeat(6, minmax(130px, 1fr));
+}
+
+.schedule-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  color: #183f38;
+  background: #edf6f1;
+  border-bottom: 1px solid #dfe8e3;
+  font-weight: 850;
+}
+
+.hour-column,
+.day-column,
+.time-slot,
+.appointment-cell {
+  border-right: 1px solid #dfe8e3;
+}
+
+.hour-column,
+.day-column {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  min-height: 58px;
+  padding: 10px;
+}
+
+.day-name {
+  color: #64748b;
+  font-size: 0.74rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.day-number {
+  color: #183f38;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.schedule-body {
+  height: calc(100% - 59px);
+  overflow: auto;
+}
+
+.time-row {
+  min-height: 68px;
+  border-bottom: 1px solid #dfe8e3;
+}
+
+.time-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  background: #f8faf9;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.appointment-cell {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 7px;
+  background: #ffffff;
+  cursor: default;
+}
+
+.appointment-cell.empty::after {
+  content: '';
+  width: 100%;
+  border: 1px dashed #e5ece8;
+  border-radius: 8px;
+}
+
+.appointment-cell.booked {
+  cursor: pointer;
+}
+
+.appointment-slot {
+  display: grid;
+  align-content: center;
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
+  background: #e9f8ef;
+  border: 1px solid #bfe5cf;
+  border-left: 4px solid #2f6f62;
+  border-radius: 8px;
+}
+
+.appointment-cell.booked:hover .appointment-slot {
+  background: #ddf4e8;
+  box-shadow: 0 8px 18px rgba(47, 111, 98, 0.12);
+}
+
+.appointment-name {
+  min-width: 0;
+  color: #183f38;
+  font-size: 0.82rem;
+  font-weight: 850;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.appointment-phone {
+  min-width: 0;
+  color: #2f6f62;
+  font-size: 0.74rem;
+  font-weight: 750;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.appointment-stack-count {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  color: #ffffff;
+  background: #183f38;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.appointment-cell.status-pendiente .appointment-slot {
+  background: #fff8e8;
+  border-color: #f2d9a6;
+  border-left-color: #b7791f;
+}
+
+.appointment-cell.status-realizada .appointment-slot {
+  background: #eefcf3;
+  border-color: #bfe5cf;
+  border-left-color: #10b981;
+}
+
+.appointment-cell.status-cancelada .appointment-slot,
+.appointment-cell.status-no_asistio .appointment-slot {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  border-left-color: #e11d48;
+}
+
+.appointment-cell.status-reagendada .appointment-slot {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  border-left-color: #6366f1;
+}
+
+.appointment-cell.type-bloqueo .appointment-slot,
+.appointment-cell.type-vacaciones .appointment-slot,
+.appointment-cell.type-feriado .appointment-slot {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  border-left-color: #475569;
+}
+
+@media (max-width: 900px) {
+  .week-navigation {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .week-info {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  .schedule-table {
+    overflow-x: auto;
+  }
+
+  .schedule-header,
+  .time-row {
+    min-width: 880px;
+  }
+}

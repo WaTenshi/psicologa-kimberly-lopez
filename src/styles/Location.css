@@ -1,0 +1,119 @@
+.location {
+  padding: var(--section-padding) 20px;
+  background: #ffffff;
+}
+
+.location-container {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.22fr);
+  gap: clamp(28px, 5vw, 56px);
+  align-items: center;
+  width: min(var(--container-width), 100%);
+  margin: 0 auto;
+}
+
+.location-info h2 {
+  margin-bottom: 16px;
+}
+
+.location-info > p {
+  margin-bottom: 24px;
+  font-size: 1.04rem;
+  line-height: 1.75;
+}
+
+.address-box {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.address-detail {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 18px;
+  background: var(--warm-cream);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+}
+
+.address-detail .icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  color: var(--accent-green);
+  background: #ffffff;
+  border-radius: var(--radius);
+}
+
+.address-detail .label {
+  margin: 0 0 2px;
+  color: var(--terracotta);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.address-detail .content {
+  margin: 0;
+  color: var(--accent-green);
+  font-weight: 750;
+}
+
+.location-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  color: var(--light-text);
+  background: var(--accent-green);
+  border-radius: var(--radius);
+  font-weight: 800;
+  transition: var(--transition);
+}
+
+.location-link:hover {
+  background: var(--primary-green);
+  transform: translateY(-2px);
+}
+
+.location-map {
+  overflow: hidden;
+  min-height: 430px;
+  background: var(--very-light-green);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+
+.location-map iframe {
+  width: 100%;
+  height: 430px;
+  border: 0;
+  display: block;
+  filter: saturate(0.82) contrast(0.95);
+}
+
+@media (max-width: 900px) {
+  .location-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .address-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .location-map,
+  .location-map iframe {
+    min-height: 340px;
+    height: 340px;
+  }
+}

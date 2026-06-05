@@ -1,0 +1,84 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == "ps.natasha.silva@gmail.com";
+    }
+
+    function validPublicAppointment() {
+      return request.resource.data.keys().hasOnly([
+          "nombre",
+          "apellido",
+          "edad",
+          "rut",
+          "telefono",
+          "email",
+          "motivo",
+          "fecha",
+          "hora",
+          "createdAt",
+          "estado"
+        ])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 2
+        && request.resource.data.nombre.size() <= 80
+        && request.resource.data.apellido is string
+        && request.resource.data.apellido.size() >= 2
+        && request.resource.data.apellido.size() <= 80
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 160
+        && request.resource.data.telefono is string
+        && request.resource.data.telefono.size() <= 30
+        && request.resource.data.motivo is string
+        && request.resource.data.motivo.size() <= 1500
+        && request.resource.data.fecha is string
+        && request.resource.data.fecha.size() == 10
+        && request.resource.data.hora is string
+        && request.resource.data.hora.size() == 5
+        && request.resource.data.estado == "confirmada";
+    }
+
+    function validAvailabilityBlock() {
+      return request.resource.data.keys().hasOnly([
+          "fecha",
+          "hora",
+          "tipo",
+          "createdAt"
+        ])
+        && request.resource.data.fecha is string
+        && request.resource.data.fecha.size() == 10
+        && request.resource.data.hora is string
+        && request.resource.data.hora.size() == 5
+        && request.resource.data.tipo == "sesion";
+    }
+
+    match /availability_blocks/{slotId} {
+      allow read: if true;
+      allow create: if isAdmin() || validAvailabilityBlock();
+      allow update, delete: if isAdmin();
+    }
+
+    match /appointments/{appointmentId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if isAdmin() || validPublicAppointment();
+    }
+
+    match /patients/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /sessions/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /quick_notes/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
