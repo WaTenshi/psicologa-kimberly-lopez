@@ -4,7 +4,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function isAdmin() {
       return request.auth != null
-        && request.auth.token.email == "ps.natasha.silva@gmail.com";
+        && request.auth.token.email in [
+          "psico.klo@gmail.com",
+          "terapiaconkimberlylopez@gmail.com",
+          "angel.abarzua15@gmail.com"
+        ];
     }
 
     function validPublicAppointment() {
@@ -15,6 +19,9 @@ service cloud.firestore {
           "rut",
           "telefono",
           "email",
+          "servicio",
+          "servicioLabel",
+          "servicioValor",
           "motivo",
           "fecha",
           "hora",
@@ -31,6 +38,15 @@ service cloud.firestore {
         && request.resource.data.email.size() <= 160
         && request.resource.data.telefono is string
         && request.resource.data.telefono.size() <= 30
+        && request.resource.data.servicio is string
+        && request.resource.data.servicio.size() >= 1
+        && request.resource.data.servicio.size() <= 80
+        && request.resource.data.servicioLabel is string
+        && request.resource.data.servicioLabel.size() >= 1
+        && request.resource.data.servicioLabel.size() <= 120
+        && request.resource.data.servicioValor is string
+        && request.resource.data.servicioValor.size() >= 1
+        && request.resource.data.servicioValor.size() <= 30
         && request.resource.data.motivo is string
         && request.resource.data.motivo.size() <= 1500
         && request.resource.data.fecha is string

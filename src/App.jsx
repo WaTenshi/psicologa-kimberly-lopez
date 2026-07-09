@@ -8,12 +8,11 @@ import Services from './components/Services'
 import Approach from './components/Approach'
 import About from './components/About'
 import WorkingStyle from './components/WorkingStyle'
-import Diplomas from './components/Diplomas'
 import Location from './components/Location'
+import SocialContent from './components/SocialContent'
 import Footer from './components/Footer'
 import AdminLogin from './components/AdminLogin'
 import AdminDashboard from './components/AdminDashboard'
-import FloatingChat from './components/FloatingChat'
 
 function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false)
@@ -57,15 +56,13 @@ function App() {
     <div className="app">
       <Navbar />
       <Hero />
+      <About />
       <Services />
       <Approach />
-      <About />
       <WorkingStyle />
-      <Diplomas />
       <Location />
+      <SocialContent />
       <Footer onAdminClick={() => setShowAdminLogin(true)} />
-
-      <FloatingChat />
       
       {showAdminLogin && (
         <AdminLogin

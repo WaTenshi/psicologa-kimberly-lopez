@@ -6,9 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background:
-    radial-gradient(circle at top left, rgba(184, 213, 199, 0.22), transparent 34%),
-    rgba(15, 23, 42, 0.64);
+  background: rgba(15, 23, 42, 0.64);
   backdrop-filter: blur(10px);
 }
 
@@ -17,7 +15,7 @@
   width: min(440px, 100%);
   padding: 34px;
   background: #ffffff;
-  border: 1px solid rgba(47, 111, 98, 0.16);
+  border: 1px solid rgba(138, 95, 54, 0.16);
   border-radius: 10px;
   box-shadow: 0 28px 90px rgba(15, 23, 42, 0.28);
   animation: adminLoginIn 0.22s ease;
@@ -52,9 +50,9 @@
 }
 
 .admin-login-modal .close-btn:hover {
-  color: #183f38;
-  background: #edf6f1;
-  border-color: rgba(47, 111, 98, 0.22);
+  color: #2f261e;
+  background: #fbf3e8;
+  border-color: rgba(138, 95, 54, 0.22);
 }
 
 .admin-login-badge {
@@ -64,15 +62,15 @@
   width: 54px;
   height: 54px;
   margin-bottom: 18px;
-  color: #183f38;
-  background: #edf6f1;
-  border: 1px solid rgba(47, 111, 98, 0.14);
+  color: #8a5f36;
+  background: #fbf3e8;
+  border: 1px solid rgba(138, 95, 54, 0.14);
   border-radius: 10px;
 }
 
 .admin-login-container h2 {
   margin: 0 44px 8px 0;
-  color: #183f38;
+  color: #2f261e;
   font-size: 1.75rem;
   line-height: 1.12;
 }
@@ -95,7 +93,7 @@
 }
 
 .admin-login-modal .form-group label {
-  color: #183f38;
+  color: #2f261e;
   font-size: 0.86rem;
   font-weight: 800;
 }
@@ -107,20 +105,20 @@
   min-height: 48px;
   padding: 0 13px;
   background: #f8fafc;
-  border: 1px solid #dbe7df;
+  border: 1px solid #ead8df;
   border-radius: 8px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .admin-login-input:focus-within {
   background: #ffffff;
-  border-color: #2f6f62;
-  box-shadow: 0 0 0 4px rgba(47, 111, 98, 0.12);
+  border-color: #8a5f36;
+  box-shadow: 0 0 0 4px rgba(138, 95, 54, 0.12);
 }
 
 .admin-login-input svg {
   flex: 0 0 auto;
-  color: #2f6f62;
+  color: #8a5f36;
 }
 
 .admin-login-input input {
@@ -157,12 +155,12 @@
 }
 
 .password-visibility-btn:hover:not(:disabled) {
-  color: #183f38;
-  background: #edf6f1;
+  color: #2f261e;
+  background: #fbf3e8;
 }
 
 .password-visibility-btn:focus-visible {
-  outline: 2px solid #2f6f62;
+  outline: 2px solid #8a5f36;
   outline-offset: 2px;
 }
 
@@ -182,7 +180,7 @@
   min-height: 48px;
   margin-top: 4px;
   color: #ffffff;
-  background: #183f38;
+  background: #2f261e;
   border: 0;
   border-radius: 8px;
   font-size: 0.95rem;
@@ -192,9 +190,9 @@
 }
 
 .login-button:hover:not(:disabled) {
-  background: #2f6f62;
+  background: #8a5f36;
   transform: translateY(-1px);
-  box-shadow: 0 12px 22px rgba(24, 63, 56, 0.18);
+  box-shadow: 0 12px 22px rgba(138, 95, 54, 0.18);
 }
 
 .login-button:disabled {
@@ -217,3 +215,4 @@
     padding: 26px 18px;
   }
 }
+

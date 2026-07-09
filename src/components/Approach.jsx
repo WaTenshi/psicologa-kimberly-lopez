@@ -3,10 +3,10 @@ import '../styles/Approach.css'
 
 export default function Approach() {
   const benefits = [
-    'Enfoque práctico y orientado a objetivos',
-    'Estrategias concretas para aplicar entre sesiones',
-    'Revisión de pensamientos, emociones y conductas',
-    'Proceso colaborativo y respetuoso de tu ritmo',
+    'Sesiones online con encuadre confidencial',
+    'Objetivos terapéuticos acordados en conjunto',
+    'Herramientas prácticas para el día a día',
+    'Seguimiento respetuoso de tus tiempos',
   ]
 
   return (
@@ -14,11 +14,11 @@ export default function Approach() {
       <div className="approach-container">
         <div className="approach-content">
           <span className="section-kicker">Enfoque terapéutico</span>
-          <h2>Un proceso claro, humano y orientado a cambios posibles</h2>
+          <h2>Un vínculo que cuida, desde el respeto y la calma</h2>
           <p>
-            Trabajo desde el modelo cognitivo-conductual, integrando comprensión,
-            psicoeducación y estrategias prácticas para que puedas reconocer patrones
-            y construir nuevas formas de responder a lo que te ocurre.
+            Trabajo desde un enfoque cognitivo-conductual, integrando escucha,
+            psicoeducación y estrategias que te ayuden a comprender lo que ocurre
+            y avanzar paso a paso.
           </p>
 
           <div className="approach-benefits">
@@ -38,9 +38,8 @@ export default function Approach() {
             </div>
             <h3>Enfoque Cognitivo-Conductual</h3>
             <p>
-              Una forma de trabajo activa, estructurada y colaborativa, centrada en
-              comprender qué sostiene el malestar y qué herramientas pueden ayudarte
-              a avanzar.
+              Una forma de trabajo colaborativa y concreta, adaptada a tu motivo de
+              consulta, etapa vital y contexto familiar o laboral.
             </p>
           </div>
 

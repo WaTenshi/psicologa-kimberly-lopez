@@ -14,7 +14,7 @@
 }
 
 .month-info {
-  color: #183f38;
+  color: #2f261e;
   font-size: 0.98rem;
   font-weight: 850;
   text-align: center;
@@ -25,7 +25,7 @@
   min-height: 0;
   overflow: hidden;
   background: #ffffff;
-  border: 1px solid #dfe8e3;
+  border: 1px solid #e8d7c2;
   border-radius: 8px;
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.04);
 }
@@ -37,14 +37,14 @@
 }
 
 .calendar-header {
-  color: #183f38;
-  background: #edf6f1;
-  border-bottom: 1px solid #dfe8e3;
+  color: #2f261e;
+  background: #fbf3e8;
+  border-bottom: 1px solid #e8d7c2;
 }
 
 .weekday-header {
   padding: 12px;
-  border-right: 1px solid #dfe8e3;
+  border-right: 1px solid #e8d7c2;
   font-size: 0.78rem;
   font-weight: 900;
   text-align: center;
@@ -63,8 +63,8 @@
   gap: 8px;
   padding: 11px;
   background: #ffffff;
-  border-right: 1px solid #dfe8e3;
-  border-bottom: 1px solid #dfe8e3;
+  border-right: 1px solid #e8d7c2;
+  border-bottom: 1px solid #e8d7c2;
   cursor: pointer;
   transition: background 0.18s ease;
 }
@@ -89,7 +89,7 @@
   justify-content: center;
   width: 30px;
   height: 30px;
-  color: #183f38;
+  color: #2f261e;
   font-weight: 900;
   border-radius: 999px;
 }
@@ -106,9 +106,9 @@
 }
 
 .appointment-count {
-  color: #183f38;
-  background: #e9f8ef;
-  border: 1px solid #bfe5cf;
+  color: #2f261e;
+  background: #fbf3e8;
+  border: 1px solid #e1c7a7;
 }
 
 .appointment-list {
@@ -120,9 +120,9 @@
 
 .appointment-badge {
   justify-content: flex-start;
-  color: #2f6f62;
+  color: #8a5f36;
   background: #ffffff;
-  border: 1px solid #cfe5d8;
+  border: 1px solid #e8d7c2;
 }
 
 .appointment-badge.status-pendiente {
@@ -132,9 +132,9 @@
 }
 
 .appointment-badge.status-realizada {
-  color: #047857;
-  background: #eefcf3;
-  border-color: #bfe5cf;
+  color: #8a5f36;
+  background: #fbf3e8;
+  border-color: #e1c7a7;
 }
 
 .appointment-badge.status-cancelada,
@@ -177,3 +177,4 @@
     min-width: 860px;
   }
 }
+

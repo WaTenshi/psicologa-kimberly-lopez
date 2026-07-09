@@ -13,8 +13,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <a className="navbar-logo" href="#inicio" onClick={() => setIsOpen(false)}>
-          <h1>Natasha Silva</h1>
-          <span className="subtitle">Psicóloga clínica</span>
+          <h1>Kimberly López</h1>
         </a>
 
         <button className="menu-toggle" onClick={toggleMenu} aria-label="Abrir navegación">
@@ -34,22 +33,17 @@ export default function Navbar() {
           </li>
           <li>
             <a href="#sobre-mi" onClick={() => setIsOpen(false)}>
-              Sobre Mí
+              Sobre mí
             </a>
           </li>
           <li>
-            <a href="#forma-trabajo" onClick={() => setIsOpen(false)}>
-              Forma de Trabajo
+            <a href="#agenda" onClick={() => setIsOpen(false)}>
+              Agenda
             </a>
           </li>
           <li>
-            <a href="#diplomas" onClick={() => setIsOpen(false)}>
-              Credenciales
-            </a>
-          </li>
-          <li>
-            <a href="#ubicacion" onClick={() => setIsOpen(false)}>
-              Ubicación
+            <a href="#contenido" onClick={() => setIsOpen(false)}>
+              Contenido
             </a>
           </li>
           <li>

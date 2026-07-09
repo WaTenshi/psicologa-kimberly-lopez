@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  ClipboardCheck,
   Clock,
   IdCard,
   Loader2,
@@ -18,10 +19,26 @@ import { db } from '../config/firebase'
 import { sendBookingEmails, saveBookingToFirestore } from '../services/emailService'
 import '../styles/BookingModal.css'
 
-const timeSlots = [
-  '09:00', '10:00', '11:00', '12:00', '13:00',
-  '14:00', '15:00', '16:00', '17:00', '18:00',
+const weekdayTimeSlots = ['18:00', '19:00', '20:00', '21:00']
+const saturdayTimeSlots = ['09:00', '10:00', '11:00', '12:00', '13:00']
+
+const getTimeSlotsForDate = (date) => {
+  if (!date) return []
+  return date.getDay() === 6 ? saturdayTimeSlots : weekdayTimeSlots
+}
+
+const serviceOptions = [
+  { value: 'primera-consulta', label: 'Primera consulta', price: '$20.000' },
+  { value: 'adulto-fonasa', label: 'Psicoterapia adulto - Fonasa A o B', price: '$20.000' },
+  { value: 'adulto-particular', label: 'Psicoterapia adulto particular', price: '$40.000' },
+  { value: 'infantojuvenil-fonasa', label: 'Psicoterapia infantojuvenil - Fonasa A o B', price: '$35.000' },
+  { value: 'infantojuvenil-particular', label: 'Psicoterapia infantojuvenil particular', price: '$45.000' },
+  { value: 'domicilio-infantil', label: 'Atención a domicilio infantil', price: '$50.000' },
+  { value: 'wisc-v', label: 'Evaluación WISC-V', price: '$120.000' },
 ]
+
+const getSelectedService = (value) =>
+  serviceOptions.find((service) => service.value === value)
 
 const initialFormData = {
   nombre: '',
@@ -30,6 +47,7 @@ const initialFormData = {
   rut: '',
   telefono: '',
   email: '',
+  servicio: '',
   motivo: '',
 }
 
@@ -83,7 +101,7 @@ export default function BookingModal({ isOpen, onClose }) {
     if (!formData.telefono.trim()) return setError('El teléfono es requerido'), false
     if (!formData.email.trim() || !formData.email.includes('@'))
       return setError('El correo electrónico es inválido'), false
-    if (!formData.motivo.trim()) return setError('El motivo de la consulta es requerido'), false
+    if (!formData.servicio) return setError('Selecciona el tipo de servicio'), false
     return true
   }
 
@@ -114,7 +132,8 @@ export default function BookingModal({ isOpen, onClose }) {
 
       const snapshot = await getDocs(q)
       const bookedTimes = snapshot.docs.map((doc) => doc.data().hora)
-      const available = timeSlots.filter((time) => !bookedTimes.includes(time))
+      const dateSlots = getTimeSlotsForDate(date)
+      const available = dateSlots.filter((time) => !bookedTimes.includes(time))
       setAvailableSlots(available)
     } catch (err) {
       console.error('Error al verificar horarios:', err)
@@ -163,6 +182,8 @@ export default function BookingModal({ isOpen, onClose }) {
 
       const bookingData = {
         ...formData,
+        servicioLabel: getSelectedService(formData.servicio)?.label || '',
+        servicioValor: getSelectedService(formData.servicio)?.price || '',
         fecha: dateString,
         fechaFormato: dateFormatted,
         hora: selectedTime,
@@ -249,6 +270,7 @@ export default function BookingModal({ isOpen, onClose }) {
         month: 'long',
       })
     : ''
+  const visibleTimeSlots = getTimeSlotsForDate(selectedDate)
 
   if (!isOpen) return null
 
@@ -370,14 +392,33 @@ export default function BookingModal({ isOpen, onClose }) {
             </div>
 
             <div className="booking-modal-form-group">
-              <label>Motivo de la Consulta *</label>
+              <label>Tipo de servicio *</label>
+              <div className="booking-modal-input-shell select">
+                <ClipboardCheck size={18} />
+                <select
+                  name="servicio"
+                  value={formData.servicio}
+                  onChange={handleFormChange}
+                >
+                  <option value="">Selecciona el servicio que necesitas</option>
+                  {serviceOptions.map((service) => (
+                    <option key={service.value} value={service.value}>
+                      {service.label} · {service.price}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="booking-modal-form-group">
+              <label>Motivo de la consulta <span className="booking-modal-optional">Opcional</span></label>
               <div className="booking-modal-input-shell textarea">
                 <MessageSquare size={18} />
                 <textarea
                   name="motivo"
                   value={formData.motivo}
                   onChange={handleFormChange}
-                  placeholder="Cuéntame brevemente sobre tu consulta..."
+                  placeholder="Cuéntame brevemente sobre tu consulta si quieres agregar contexto..."
                   rows="4"
                 />
               </div>
@@ -393,7 +434,7 @@ export default function BookingModal({ isOpen, onClose }) {
             <div className="booking-modal-header">
               <span className="booking-modal-step-indicator">Paso 2 de 2</span>
               <h2>Elige tu fecha y hora</h2>
-              <p>Primero selecciona un día. Luego verás las horas disponibles para confirmar tu reserva.</p>
+              <p>La agenda se abre los sábados. En semana solo se muestran horarios tarde/noche.</p>
             </div>
 
             {error && <div className="booking-modal-error-message">{error}</div>}
@@ -454,7 +495,7 @@ export default function BookingModal({ isOpen, onClose }) {
                 </div>
               ) : (
                 <div className="booking-modal-time-grid">
-                  {timeSlots.map((time) => {
+                  {visibleTimeSlots.map((time) => {
                     const isAvailable = availableSlots.includes(time)
                     const isSelected = selectedTime === time
 

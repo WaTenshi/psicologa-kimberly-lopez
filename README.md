@@ -1,6 +1,6 @@
-# Consultora psicológica Natasha Silva
+# Psicóloga Kimberly López
 
-Landing pública, sistema de reservas y CRM administrativo para la consulta psicológica de Natasha Silva.
+Landing pública, sistema de reservas y CRM administrativo para la consulta psicológica de Kimberly López.
 
 ## Desarrollo local
 
@@ -29,7 +29,7 @@ En GitHub debes:
 
 La URL esperada es:
 
-`https://watenshi.github.io/consultora-psicologica/`
+`https://watenshi.github.io/ps.kimberly/`
 
 ## Firebase
 

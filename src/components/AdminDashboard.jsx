@@ -225,7 +225,7 @@ export default function AdminDashboard({ onLogout }) {
       <div className="admin-header">
         <div className="admin-title">
           <h1>Panel de Administración</h1>
-          <p>Natasha Silva - Consultora Psicológica</p>
+          <p>Kimberly López - Consulta Psicológica</p>
         </div>
         <button className="logout-btn" onClick={handleLogout}>
           <MdLogout />

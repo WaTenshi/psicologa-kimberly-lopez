@@ -1,21 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 :root {
-  --primary-green: #2f6f62;
-  --secondary-green: #7aa58f;
-  --light-green: #b8d5c7;
-  --very-light-green: #edf6f1;
-  --accent-green: #183f38;
-  --warm-cream: #fbf7f0;
-  --warm-sand: #efe2d0;
-  --terracotta: #b56f54;
-  --dark-text: #1f2d2a;
-  --muted-text: #63716d;
+  --primary-green: #8a5f36;
+  --secondary-green: #ebd2b3;
+  --light-green: #f2dfc7;
+  --very-light-green: #fbf3e8;
+  --accent-green: #2f261e;
+  --warm-cream: #fbf7ef;
+  --warm-sand: #ead3b7;
+  --terracotta: #b6783d;
+  --dark-text: #1f2633;
+  --muted-text: #6d6257;
   --light-text: #ffffff;
-  --gray-light: #f6f8f6;
-  --gray-medium: #dce6e1;
-  --border-soft: rgba(47, 111, 98, 0.16);
-  --shadow-soft: 0 18px 50px rgba(24, 63, 56, 0.10);
-  --shadow-hover: 0 22px 58px rgba(24, 63, 56, 0.16);
+  --gray-light: #f7f8fa;
+  --gray-medium: #dfe4e8;
+  --border-soft: rgba(138, 95, 54, 0.18);
+  --shadow-soft: 0 18px 50px rgba(47, 38, 30, 0.10);
+  --shadow-hover: 0 22px 58px rgba(47, 38, 30, 0.15);
   --font-primary: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --font-heading: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Plus Jakarta Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   --spacing-xs: 8px;
   --spacing-sm: 16px;
   --spacing-md: 24px;
@@ -42,7 +46,7 @@ body {
   min-width: 320px;
   color: var(--dark-text);
   background:
-    linear-gradient(180deg, #fbf7f0 0%, #ffffff 32%, #f7fbf8 100%);
+    linear-gradient(180deg, #fbf7ef 0%, #fbf3e8 42%, #ffffff 100%);
   font-family: var(--font-primary);
   line-height: 1.6;
 }
@@ -72,6 +76,7 @@ img {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  font-family: var(--font-body);
 }
 
 h1,
@@ -81,17 +86,18 @@ h4,
 h5,
 h6 {
   color: var(--accent-green);
-  font-weight: 750;
+  font-family: var(--font-heading);
+  font-weight: 800;
   line-height: 1.08;
   letter-spacing: 0;
 }
 
 h1 {
-  font-size: clamp(3rem, 7vw, 5.85rem);
+  font-size: 5rem;
 }
 
 h2 {
-  font-size: clamp(2rem, 4vw, 3.35rem);
+  font-size: 3.15rem;
 }
 
 h3 {
@@ -101,6 +107,7 @@ h3 {
 p {
   color: var(--muted-text);
   font-size: 1rem;
+  font-weight: 500;
 }
 
 .section-heading {
@@ -114,9 +121,10 @@ p {
   display: inline-flex;
   margin-bottom: 12px;
   color: var(--terracotta);
+  font-family: var(--font-body);
   font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -133,7 +141,25 @@ p {
     --section-padding: 56px;
   }
 
+  h1 {
+    font-size: 3.05rem;
+  }
+
+  h2 {
+    font-size: 2.15rem;
+  }
+
   html {
     scroll-padding-top: 72px;
+  }
+}
+
+@media (max-width: 420px) {
+  h1 {
+    font-size: 2.55rem;
+  }
+
+  h2 {
+    font-size: 1.92rem;
   }
 }

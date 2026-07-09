@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    base: process.env.GITHUB_ACTIONS === 'true' ? '/consultora-psicologica/' : '/',
+    base: process.env.GITHUB_ACTIONS === 'true' ? '/ps.kimberly/' : '/',
     plugins: [
       react(),
       babel({ presets: [reactCompilerPreset()] })

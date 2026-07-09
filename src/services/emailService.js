@@ -16,8 +16,8 @@ const sendClientEmail = (bookingData) => {
   const params = {
     to_email: bookingData.email,
     to_name: `${bookingData.nombre} ${bookingData.apellido}`,
-    subject: 'Confirmación de tu cita - Natasha Silva Psicología',
-    message: `Hola ${bookingData.nombre}, tu cita ha sido confirmada para el ${bookingData.fechaFormato} a las ${bookingData.hora} hrs. Te esperamos. — Natasha Silva`,
+    subject: 'Confirmación de tu cita - Kimberly López Psicología',
+    message: `Hola ${bookingData.nombre}, tu cita ha sido confirmada para el ${bookingData.fechaFormato} a las ${bookingData.hora} hrs. Servicio: ${bookingData.servicioLabel || 'No indicado'}. Te esperamos. — Kimberly López`,
   }
   return emailjs.send(EMAILJS_SERVICE_ID, CLIENT_TEMPLATE_ID, params, EMAILJS_PUBLIC_KEY)
 }
@@ -25,8 +25,8 @@ const sendClientEmail = (bookingData) => {
 // Correo a la psicóloga notificando nueva reserva
 export const sendTherapistEmail = (bookingData) => {
   const params = {
-    to_email: 'ps.natasha.silva@gmail.com',
-    to_name: 'Natasha Silva',
+    to_email: 'terapiaconkimberlylopez@gmail.com',
+    to_name: 'Kimberly López',
     subject: 'Nueva reserva de cita',
     message:
       `Nueva cita agendada:\n\n` +
@@ -35,9 +35,11 @@ export const sendTherapistEmail = (bookingData) => {
       `Edad: ${bookingData.edad}\n` +
       `Teléfono: ${bookingData.telefono}\n` +
       `Email: ${bookingData.email}\n` +
+      `Servicio: ${bookingData.servicioLabel || 'No indicado'}\n` +
+      `Valor: ${bookingData.servicioValor || 'No indicado'}\n` +
       `Fecha: ${bookingData.fechaFormato}\n` +
       `Hora: ${bookingData.hora} hrs\n` +
-      `Motivo: ${bookingData.motivo}`,
+      `Motivo: ${bookingData.motivo || 'No indicado'}`,
   }
   return emailjs.send(EMAILJS_SERVICE_ID, THERAPIST_TEMPLATE_ID, params, EMAILJS_PUBLIC_KEY)
 }
@@ -84,6 +86,9 @@ export const saveBookingToFirestore = async (db, bookingData) => {
       rut: bookingData.rut,
       telefono: bookingData.telefono,
       email: bookingData.email,
+      servicio: bookingData.servicio,
+      servicioLabel: bookingData.servicioLabel,
+      servicioValor: bookingData.servicioValor,
       motivo: bookingData.motivo,
       fecha: bookingData.fecha,
       hora: bookingData.hora,

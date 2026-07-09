@@ -1,12 +1,12 @@
 .admin-dashboard {
-  --admin-bg: #f4f7f5;
+  --admin-bg: #fff8f2;
   --admin-surface: #ffffff;
-  --admin-surface-soft: #f8faf9;
-  --admin-border: #dfe8e3;
-  --admin-text: #1f2d2a;
+  --admin-surface-soft: #fbf3e8;
+  --admin-border: #ead8df;
+  --admin-text: #1f2633;
   --admin-muted: #64748b;
-  --admin-green: #2f6f62;
-  --admin-green-dark: #183f38;
+  --admin-green: #8a5f36;
+  --admin-green-dark: #2f261e;
   --admin-blue: #2563eb;
   --admin-amber: #b7791f;
   --admin-red: #b42318;
@@ -29,9 +29,9 @@
   min-height: 43px;
   gap: 10px;
   padding: 0 12px;
-  color: #183f38;
-  background: #f8faf9;
-  border: 1px solid #dfe8e3;
+  color: var(--admin-green-dark);
+  background: var(--admin-surface-soft);
+  border: 1px solid var(--admin-border);
   border-radius: 8px;
   font-weight: 800;
 }
@@ -47,7 +47,7 @@
   padding: 18px;
   margin-bottom: 18px;
   background: #ffffff;
-  border: 1px solid #dfe8e3;
+  border: 1px solid #e8d7c2;
   border-radius: 8px;
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
 }
@@ -62,7 +62,7 @@
 
 .today-panel-header span,
 .pipeline-header span {
-  color: #2f6f62;
+  color: #8a5f36;
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -71,7 +71,7 @@
 .today-panel-header h2,
 .pipeline-header h3 {
   margin: 4px 0 0;
-  color: #183f38;
+  color: #2f261e;
 }
 
 .today-panel-kpis {
@@ -79,13 +79,13 @@
   min-width: 90px;
   justify-items: center;
   padding: 10px;
-  background: #edf6f1;
-  border: 1px solid #dfe8e3;
+  background: #fbf3e8;
+  border: 1px solid #e8d7c2;
   border-radius: 8px;
 }
 
 .today-panel-kpis strong {
-  color: #183f38;
+  color: #2f261e;
   font-size: 1.5rem;
 }
 
@@ -109,7 +109,7 @@
   min-height: 170px;
   padding: 14px;
   background: #f8faf9;
-  border: 1px solid #dfe8e3;
+  border: 1px solid #e8d7c2;
   border-radius: 8px;
 }
 
@@ -118,7 +118,7 @@
   align-items: center;
   gap: 8px;
   margin: 0;
-  color: #183f38;
+  color: #2f261e;
   font-size: 0.92rem;
 }
 
@@ -132,15 +132,15 @@
   gap: 2px;
   padding: 9px;
   background: #ffffff;
-  border: 1px solid #e5ece8;
-  border-left: 4px solid #2f6f62;
+  border: 1px solid #efe1cf;
+  border-left: 4px solid #8a5f36;
   border-radius: 8px;
 }
 
 .today-row strong,
 .today-row span {
   min-width: 0;
-  color: #183f38;
+  color: #2f261e;
   overflow-wrap: anywhere;
 }
 
@@ -163,7 +163,7 @@
   margin: 18px 0;
   padding: 16px;
   background: #ffffff;
-  border: 1px solid #dfe8e3;
+  border: 1px solid #e8d7c2;
   border-radius: 8px;
 }
 
@@ -187,7 +187,7 @@
   min-height: 180px;
   padding: 12px;
   background: #f8faf9;
-  border: 1px solid #dfe8e3;
+  border: 1px solid #e8d7c2;
   border-radius: 8px;
 }
 
@@ -205,7 +205,7 @@
 }
 
 .pipeline-column-title strong {
-  color: #183f38;
+  color: #2f261e;
   font-size: 0.82rem;
 }
 
@@ -233,18 +233,18 @@
   padding: 10px;
   text-align: left;
   background: #ffffff;
-  border: 1px solid #e5ece8;
+  border: 1px solid #efe1cf;
   border-radius: 8px;
   cursor: pointer;
 }
 
 .pipeline-cards button:hover {
-  border-color: rgba(47, 111, 98, 0.34);
+  border-color: rgba(138, 95, 54, 0.34);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
 }
 
 .pipeline-cards strong {
-  color: #183f38;
+  color: #2f261e;
 }
 
 .pipeline-cards small {
@@ -268,7 +268,7 @@
   padding: 0 12px;
   color: #64748b;
   background: #f8faf9;
-  border: 1px solid #dfe8e3;
+  border: 1px solid #e8d7c2;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 850;
@@ -277,8 +277,8 @@
 
 .patient-profile-tabs button.active {
   color: #ffffff;
-  background: #2f6f62;
-  border-color: #2f6f62;
+  background: #8a5f36;
+  border-color: #8a5f36;
 }
 
 .patient-tab-panel {
@@ -286,7 +286,7 @@
   gap: 12px;
   padding: 14px;
   background: #f8faf9;
-  border: 1px solid #dfe8e3;
+  border: 1px solid #e8d7c2;
   border-radius: 8px;
 }
 
@@ -295,8 +295,8 @@
   gap: 6px;
   padding: 12px;
   background: #ffffff;
-  border: 1px solid #e5ece8;
-  border-left: 4px solid #2f6f62;
+  border: 1px solid #efe1cf;
+  border-left: 4px solid #8a5f36;
   border-radius: 8px;
 }
 
@@ -309,11 +309,11 @@
 }
 
 .patient-timeline-item strong {
-  color: #183f38;
+  color: #2f261e;
 }
 
 .patient-timeline-item span {
-  color: #2f6f62;
+  color: #8a5f36;
   font-weight: 850;
 }
 
@@ -330,7 +330,7 @@
 .payment-summary-strip div {
   padding: 12px;
   background: #ffffff;
-  border: 1px solid #e5ece8;
+  border: 1px solid #efe1cf;
   border-radius: 8px;
 }
 
@@ -345,7 +345,7 @@
 .payment-summary-strip strong {
   display: block;
   margin-top: 5px;
-  color: #183f38;
+  color: #2f261e;
   font-size: 1.15rem;
 }
 
@@ -355,7 +355,7 @@
 }
 
 .empty-tab-panel svg {
-  color: #2f6f62;
+  color: #8a5f36;
   font-size: 2rem;
 }
 
@@ -365,7 +365,7 @@
 }
 
 .empty-tab-panel h3 {
-  color: #183f38;
+  color: #2f261e;
 }
 
 .empty-tab-panel p {
@@ -391,7 +391,7 @@
 .admin-title h1 {
   margin: 0 0 4px;
   color: #ffffff;
-  font-size: clamp(1.35rem, 2vw, 1.9rem);
+  font-size: 1.75rem;
 }
 
 .admin-title p {
@@ -633,7 +633,7 @@
 .notes-input-container textarea:focus {
   background: #ffffff;
   border-color: var(--admin-green);
-  box-shadow: 0 0 0 4px rgba(47, 111, 98, 0.12);
+  box-shadow: 0 0 0 4px rgba(138, 95, 54, 0.12);
 }
 
 .form-actions,
@@ -702,7 +702,7 @@
   width: 48px;
   height: 48px;
   color: var(--admin-green-dark);
-  background: #edf6f1;
+  background: #fbf3e8;
   border-radius: var(--admin-radius);
 }
 
@@ -773,7 +773,7 @@
 .session-item:hover,
 .note-card:hover {
   background: #ffffff;
-  border-color: rgba(47, 111, 98, 0.32);
+  border-color: rgba(138, 95, 54, 0.32);
   transform: translateY(-1px);
 }
 
@@ -971,7 +971,7 @@
   color: var(--admin-green);
   font-size: 0.76rem;
   font-weight: 900;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -986,7 +986,7 @@
   min-height: 40px;
   padding: 8px 12px;
   color: var(--admin-green-dark);
-  background: #edf6f1;
+  background: #fbf3e8;
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius);
   font-size: 0.84rem;
@@ -1049,7 +1049,7 @@
   min-height: 40px;
   padding: 0 12px;
   color: var(--admin-green-dark);
-  background: #edf6f1;
+  background: #fbf3e8;
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius);
   font-size: 0.84rem;
@@ -1101,7 +1101,7 @@
 }
 
 .patient-card:hover {
-  border-color: rgba(47, 111, 98, 0.38);
+  border-color: rgba(138, 95, 54, 0.38);
   box-shadow: var(--admin-shadow);
   transform: translateY(-2px);
 }
@@ -1136,7 +1136,7 @@
   min-height: 24px;
   padding: 3px 8px;
   color: var(--admin-green-dark);
-  background: #edf6f1;
+  background: #fbf3e8;
   border: 1px solid var(--admin-border);
   border-radius: 999px;
   font-size: 0.72rem;
@@ -1189,7 +1189,7 @@
   gap: 18px;
   margin-bottom: 16px;
   padding: 20px;
-  background: linear-gradient(135deg, #edf6f1, #ffffff);
+  background: linear-gradient(135deg, #fbf3e8, #ffffff);
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius);
 }
@@ -1198,7 +1198,7 @@
   color: var(--admin-green);
   font-size: 0.76rem;
   font-weight: 900;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -1234,7 +1234,7 @@
   color: var(--admin-muted);
   font-size: 0.72rem;
   font-weight: 900;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -1272,7 +1272,7 @@
   gap: 2px;
   min-width: 220px;
   padding: 10px 12px;
-  background: #edf6f1;
+  background: #fbf3e8;
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius);
 }
@@ -1283,7 +1283,7 @@
   color: var(--admin-green);
   font-size: 0.72rem;
   font-weight: 900;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -1327,7 +1327,7 @@
 .session-search input:focus {
   background: #ffffff;
   border-color: var(--admin-green);
-  box-shadow: 0 0 0 4px rgba(47, 111, 98, 0.12);
+  box-shadow: 0 0 0 4px rgba(138, 95, 54, 0.12);
 }
 
 .session-count {
@@ -1336,7 +1336,7 @@
   justify-content: center;
   min-height: 40px;
   padding: 0 12px;
-  background: #edf6f1;
+  background: #fbf3e8;
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius);
   white-space: nowrap;
@@ -1387,7 +1387,7 @@
   bottom: 8px;
   left: 8px;
   width: 2px;
-  background: #dfe8e3;
+  background: #e8d7c2;
 }
 
 .clinical-session-card {
@@ -1405,7 +1405,7 @@
   background: var(--admin-green);
   border: 3px solid #ffffff;
   border-radius: 999px;
-  box-shadow: 0 0 0 1px #bcd7ca;
+  box-shadow: 0 0 0 1px #d7bfa1;
 }
 
 .session-card-main {
@@ -1419,7 +1419,7 @@
 }
 
 .session-card-main:hover {
-  border-color: rgba(47, 111, 98, 0.34);
+  border-color: rgba(138, 95, 54, 0.34);
   box-shadow: var(--admin-shadow);
 }
 
@@ -1454,7 +1454,7 @@
   color: var(--admin-muted);
   font-size: 0.76rem;
   font-weight: 900;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -1500,7 +1500,7 @@
   color: var(--admin-muted);
   font-size: 0.72rem;
   font-weight: 900;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -1654,7 +1654,7 @@
   color: var(--admin-muted);
   font-size: 0.72rem;
   font-weight: 850;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -1753,3 +1753,4 @@
     justify-content: flex-end;
   }
 }
+
