@@ -7,14 +7,16 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,22 +34,78 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY || vars.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN || vars.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID || vars.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET || vars.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID || vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID || vars.VITE_FIREBASE_APP_ID }}
-          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID || vars.VITE_FIREBASE_MEASUREMENT_ID }}
-          VITE_EMAILJS_PUBLIC_KEY: ${{ secrets.VITE_EMAILJS_PUBLIC_KEY || vars.VITE_EMAILJS_PUBLIC_KEY }}
-          VITE_EMAILJS_SERVICE_ID: ${{ secrets.VITE_EMAILJS_SERVICE_ID || vars.VITE_EMAILJS_SERVICE_ID }}
-          VITE_EMAILJS_CLIENT_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_CLIENT_TEMPLATE_ID || vars.VITE_EMAILJS_CLIENT_TEMPLATE_ID }}
-          VITE_EMAILJS_THERAPIST_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_THERAPIST_TEMPLATE_ID || vars.VITE_EMAILJS_THERAPIST_TEMPLATE_ID }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+          VITE_EMAILJS_PUBLIC_KEY: ${{ secrets.VITE_EMAILJS_PUBLIC_KEY }}
+          VITE_EMAILJS_SERVICE_ID: ${{ secrets.VITE_EMAILJS_SERVICE_ID }}
+          VITE_EMAILJS_CLIENT_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_CLIENT_TEMPLATE_ID }}
+          VITE_EMAILJS_THERAPIST_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_THERAPIST_TEMPLATE_ID }}
 
-      - name: Publish to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Ensure secrets are not published
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          secret_names=(
+            VITE_FIREBASE_API_KEY
+            VITE_FIREBASE_AUTH_DOMAIN
+            VITE_FIREBASE_PROJECT_ID
+            VITE_FIREBASE_STORAGE_BUCKET
+            VITE_FIREBASE_MESSAGING_SENDER_ID
+            VITE_FIREBASE_APP_ID
+            VITE_FIREBASE_MEASUREMENT_ID
+            VITE_EMAILJS_PUBLIC_KEY
+            VITE_EMAILJS_SERVICE_ID
+            VITE_EMAILJS_CLIENT_TEMPLATE_ID
+            VITE_EMAILJS_THERAPIST_TEMPLATE_ID
+          )
+
+          leaked=0
+          for name in "${secret_names[@]}"; do
+            value="${!name:-}"
+            if [[ -n "$value" ]] && grep -R -F -q -- "$value" dist; then
+              echo "::error::$name is present in the production artifact."
+              leaked=1
+            fi
+          done
+
+          if [[ "$leaked" -ne 0 ]]; then
+            echo "Deploy stopped because one or more configured secrets would be visible in GitHub Pages."
+            exit 1
+          fi
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+          VITE_EMAILJS_PUBLIC_KEY: ${{ secrets.VITE_EMAILJS_PUBLIC_KEY }}
+          VITE_EMAILJS_SERVICE_ID: ${{ secrets.VITE_EMAILJS_SERVICE_ID }}
+          VITE_EMAILJS_CLIENT_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_CLIENT_TEMPLATE_ID }}
+          VITE_EMAILJS_THERAPIST_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_THERAPIST_TEMPLATE_ID }}
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          publish_branch: gh-pages
-          force_orphan: true
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
