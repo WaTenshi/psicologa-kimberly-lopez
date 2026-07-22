@@ -41,10 +41,25 @@ service cloud.firestore {
         || (time == "11:00" && slotId == date + "_1100")
         || (time == "12:00" && slotId == date + "_1200")
         || (time == "13:00" && slotId == date + "_1300")
+        || (time == "14:00" && slotId == date + "_1400")
+        || (time == "15:00" && slotId == date + "_1500")
+        || (time == "16:00" && slotId == date + "_1600")
+        || (time == "17:00" && slotId == date + "_1700")
         || (time == "18:00" && slotId == date + "_1800")
         || (time == "19:00" && slotId == date + "_1900")
         || (time == "20:00" && slotId == date + "_2000")
         || (time == "21:00" && slotId == date + "_2100");
+    }
+
+    function slotIsPublished(date, time) {
+      // Compatibilidad durante la migración: se conserva el horario anterior solo
+      // hasta que el panel publique por primera vez la configuración dinámica.
+      return !exists(/databases/$(database)/documents/availability_settings/default)
+        || (
+          exists(/databases/$(database)/documents/availability_calendar/$(date))
+          && get(/databases/$(database)/documents/availability_calendar/$(date)).data.fecha == date
+          && time in get(/databases/$(database)/documents/availability_calendar/$(date)).data.availableTimes
+        );
     }
 
     function validPublicAppointment(slotId) {
@@ -93,6 +108,7 @@ service cloud.firestore {
         && request.resource.data.hora is string
         && request.resource.data.hora.size() == 5
         && validSlotId(slotId, request.resource.data.fecha, request.resource.data.hora)
+        && slotIsPublished(request.resource.data.fecha, request.resource.data.hora)
         && request.resource.data.createdAt == request.time
         && request.resource.data.estado == "confirmada"
         && existsAfter(/databases/$(database)/documents/availability_blocks/$(slotId))
@@ -113,6 +129,7 @@ service cloud.firestore {
         && request.resource.data.hora is string
         && request.resource.data.hora.size() == 5
         && validSlotId(slotId, request.resource.data.fecha, request.resource.data.hora)
+        && slotIsPublished(request.resource.data.fecha, request.resource.data.hora)
         && request.resource.data.tipo == "sesion"
         && request.resource.data.createdAt == request.time
         && existsAfter(/databases/$(database)/documents/appointments/$(slotId))
@@ -129,6 +146,19 @@ service cloud.firestore {
     match /appointments/{appointmentId} {
       allow read, update, delete: if isAdmin();
       allow create: if isAdmin() || validPublicAppointment(appointmentId);
+    }
+
+    match /availability_settings/{settingId} {
+      allow get: if settingId == "default";
+      allow list: if isAdmin();
+      allow write: if isAdmin() && settingId == "default";
+    }
+
+    match /availability_calendar/{date} {
+      // El cliente público no necesita enumerar el calendario materializado.
+      // Las reglas pueden consultarlo internamente para validar una reserva.
+      allow read: if isAdmin();
+      allow write: if isAdmin();
     }
 
     match /patients/{document=**} {

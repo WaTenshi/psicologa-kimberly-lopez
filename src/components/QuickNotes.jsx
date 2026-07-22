@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { collection, getDocs, deleteDoc, doc, addDoc, query, orderBy } from 'firebase/firestore'
 import { MdAdd, MdDelete } from 'react-icons/md'
 import { db } from '../config/firebase'
+import { EmptyState, PageHeader } from './AdminUI'
 
 export default function QuickNotes() {
   const [notes, setNotes] = useState([])
@@ -90,9 +91,11 @@ export default function QuickNotes() {
 
   return (
     <div className="quick-notes">
-      <div className="notes-header">
-        <h2>Notas Rápidas</h2>
-      </div>
+      <PageHeader
+        eyebrow="Apuntes administrativos"
+        title="Notas rápidas"
+        description="Recordatorios breves para tareas, pagos, coordinación y seguimiento."
+      />
 
       {error && <div className="error-banner">{error}</div>}
 
@@ -118,7 +121,7 @@ export default function QuickNotes() {
         {loading && notes.length === 0 ? (
           <p className="loading">Cargando notas...</p>
         ) : notes.length === 0 ? (
-          <p className="no-notes">No hay notas rápidas. ¡Crea una!</p>
+          <EmptyState title="No hay notas rápidas" description="Escribe una nota para recordar una tarea administrativa." />
         ) : (
           <div className="notes-list">
             {notes.map((note) => (

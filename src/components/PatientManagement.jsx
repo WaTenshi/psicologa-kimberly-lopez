@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { collection, getDocs, deleteDoc, doc, updateDoc, addDoc, query, orderBy } from 'firebase/firestore'
-import { MdAdd, MdClose, MdDelete, MdEdit, MdSearch, MdAssignment, MdCalendarToday, MdDescription, MdNotes, MdPayment } from 'react-icons/md'
+import { MdAdd, MdDelete, MdEdit, MdSearch, MdAssignment, MdCalendarToday, MdDescription, MdNotes, MdPayment } from 'react-icons/md'
 import { db } from '../config/firebase'
+import { Drawer, EmptyState, PageHeader } from './AdminUI'
 
 const PATIENT_STATUSES = [
   { label: 'Nuevo', value: 'nuevo', color: '#3b82f6' },
@@ -348,23 +349,33 @@ export default function PatientManagement() {
 
   return (
     <div className="patient-management">
-      <div className="patient-header">
-        <div>
-          <h2>Fichas clínicas</h2>
-          <p>Registro integral de pacientes, contacto, contexto clínico y seguimiento.</p>
-        </div>
-        <button
-          className="new-patient-btn"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? <><MdClose /> Cerrar ficha</> : <><MdAdd /> Nueva ficha</>}
-        </button>
-      </div>
+      <PageHeader
+        eyebrow="Gestión clínica"
+        title="Pacientes"
+        description="Fichas clínicas, contacto, contexto terapéutico y continuidad del proceso."
+        actions={(
+          <button className="new-patient-btn" onClick={() => setShowForm(true)}>
+            <MdAdd /> Nueva ficha
+          </button>
+        )}
+      />
 
       {error && <div className="error-banner">{error}</div>}
 
-      {showForm && (
-        <div className="patient-form-container clinical-form-container">
+      <Drawer
+        open={showForm}
+        onClose={resetForm}
+        title={editingId ? 'Editar ficha clínica' : 'Nueva ficha clínica'}
+        footer={(
+          <>
+            <button className="cancel-btn" onClick={resetForm} disabled={loading}>Cancelar</button>
+            <button className="save-btn" onClick={handleSavePatient} disabled={loading}>
+              {loading ? 'Guardando...' : editingId ? 'Actualizar ficha' : 'Crear ficha'}
+            </button>
+          </>
+        )}
+      >
+        <div className="patient-form-container clinical-form-container drawer-form">
           <div className="clinical-form-heading">
             <div>
               <span>{editingId ? 'Edición de ficha' : 'Nueva ficha clínica'}</span>
@@ -401,16 +412,8 @@ export default function PatientManagement() {
             </section>
           ))}
 
-          <div className="form-actions sticky-form-actions">
-            <button className="cancel-btn" onClick={resetForm} disabled={loading}>
-              Cancelar
-            </button>
-            <button className="save-btn" onClick={handleSavePatient} disabled={loading}>
-              {loading ? 'Guardando...' : editingId ? 'Actualizar ficha' : 'Crear ficha'}
-            </button>
-          </div>
         </div>
-      )}
+      </Drawer>
 
       <div className="patient-pipeline">
         <div className="pipeline-header">
@@ -462,7 +465,11 @@ export default function PatientManagement() {
         {loading ? (
           <p className="loading">Cargando pacientes...</p>
         ) : filteredPatients.length === 0 ? (
-          <p className="no-patients">No hay pacientes registrados</p>
+          <EmptyState
+            title="No hay pacientes registrados"
+            description="Crea la primera ficha clínica para comenzar el seguimiento."
+            action={<button className="new-patient-btn" onClick={() => setShowForm(true)}><MdAdd /> Nueva ficha</button>}
+          />
         ) : (
           <div className="patients-grid">
             {filteredPatients.map((patient) => {
@@ -514,12 +521,18 @@ export default function PatientManagement() {
       </div>
 
       {selectedPatient && (
-        <div className="modal-overlay" onClick={() => setSelectedPatient(null)}>
-          <div className="modal-content clinical-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSelectedPatient(null)}>
-              <MdClose />
-            </button>
-
+        <Drawer
+          open
+          onClose={() => setSelectedPatient(null)}
+          title="Detalle del paciente"
+          footer={(
+            <>
+              <button className="delete-btn" onClick={handleDeletePatient}><MdDelete /> Eliminar</button>
+              <button className="edit-btn" onClick={handleEditPatient}><MdEdit /> Editar ficha</button>
+            </>
+          )}
+        >
+          <div className="clinical-modal-content drawer-detail">
             <div className="clinical-profile-hero">
               <div>
                 <span>Ficha clínica</span>
@@ -751,16 +764,8 @@ export default function PatientManagement() {
               </div>
             )}
 
-            <div className="modal-actions">
-              <button className="edit-btn" onClick={handleEditPatient}>
-                <MdEdit /> Editar ficha
-              </button>
-              <button className="delete-btn" onClick={handleDeletePatient}>
-                <MdDelete /> Eliminar
-              </button>
-            </div>
           </div>
-        </div>
+        </Drawer>
       )}
     </div>
   )

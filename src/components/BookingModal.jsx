@@ -1,5 +1,5 @@
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   CalendarDays,
   CheckCircle2,
@@ -16,16 +16,15 @@ import {
   X,
 } from 'lucide-react'
 import { db } from '../config/firebase'
+import {
+  createDefaultAvailabilityConfig,
+  formatDateKey,
+  getAvailableSlotsForDate,
+  parseDateKey,
+} from '../config/availability'
+import { loadAvailabilityConfig } from '../services/availabilityService'
 import { sendBookingEmails, saveBookingToFirestore } from '../services/emailService'
 import '../styles/BookingModal.css'
-
-const weekdayTimeSlots = ['18:00', '19:00', '20:00', '21:00']
-const saturdayTimeSlots = ['09:00', '10:00', '11:00', '12:00', '13:00']
-
-const getTimeSlotsForDate = (date) => {
-  if (!date) return []
-  return date.getDay() === 6 ? saturdayTimeSlots : weekdayTimeSlots
-}
 
 const serviceOptions = [
   { value: 'primera-consulta', label: 'Primera consulta', price: '$20.000' },
@@ -51,13 +50,6 @@ const initialFormData = {
   motivo: '',
 }
 
-const formatDateKey = (date) => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
 export default function BookingModal({ isOpen, onClose }) {
   const [step, setStep] = useState('form') // 'form' | 'calendar'
   const [loading, setLoading] = useState(false)
@@ -69,8 +61,31 @@ export default function BookingModal({ isOpen, onClose }) {
   const [selectedTime, setSelectedTime] = useState(null)
   const [availableSlots, setAvailableSlots] = useState([])
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0)
+  const [availabilityConfig, setAvailabilityConfig] = useState(createDefaultAvailabilityConfig)
+  const [loadingAvailability, setLoadingAvailability] = useState(true)
 
-  // Genera fechas de lunes a sábado para los próximos `days` días
+  useEffect(() => {
+    if (!isOpen) return undefined
+
+    let active = true
+    loadAvailabilityConfig()
+      .then(({ config }) => {
+        if (active) setAvailabilityConfig(config)
+      })
+      .catch((loadError) => {
+        console.warn('Se usará el horario predeterminado:', loadError)
+        if (active) setAvailabilityConfig(createDefaultAvailabilityConfig())
+      })
+      .finally(() => {
+        if (active) setLoadingAvailability(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [isOpen])
+
+  // Genera todos los días; la configuración decide cuáles se muestran cerrados.
   const getDaysFromNow = (days) => {
     const result = []
     const today = new Date()
@@ -78,11 +93,7 @@ export default function BookingModal({ isOpen, onClose }) {
     for (let i = 1; i <= days; i++) {
       const date = new Date(today)
       date.setDate(today.getDate() + i)
-      const dayOfWeek = date.getDay()
-
-      if (dayOfWeek >= 1 && dayOfWeek <= 6) {
-        result.push(date)
-      }
+      result.push(date)
     }
 
     return result
@@ -112,9 +123,13 @@ export default function BookingModal({ isOpen, onClose }) {
     setStep('calendar')
 
     if (!selectedDate) {
-      const [firstAvailableDate] = getDaysFromNow(90)
+      const firstAvailableDate = getDaysFromNow(90).find(
+        (date) => getAvailableSlotsForDate(date, availabilityConfig).length > 0,
+      )
       if (firstAvailableDate) {
         handleDateSelect(firstAvailableDate)
+      } else {
+        setError('No hay fechas disponibles en los próximos 90 días.')
       }
     }
   }
@@ -123,6 +138,12 @@ export default function BookingModal({ isOpen, onClose }) {
     try {
       setLoadingSlots(true)
       const dateString = formatDateKey(date)
+      const dateSlots = getAvailableSlotsForDate(date, availabilityConfig)
+
+      if (dateSlots.length === 0) {
+        setAvailableSlots([])
+        return
+      }
 
       const availabilityRef = collection(db, 'availability_blocks')
       const q = query(
@@ -132,7 +153,6 @@ export default function BookingModal({ isOpen, onClose }) {
 
       const snapshot = await getDocs(q)
       const bookedTimes = snapshot.docs.map((doc) => doc.data().hora)
-      const dateSlots = getTimeSlotsForDate(date)
       const available = dateSlots.filter((time) => !bookedTimes.includes(time))
       setAvailableSlots(available)
     } catch (err) {
@@ -145,6 +165,7 @@ export default function BookingModal({ isOpen, onClose }) {
   }
 
   const handleDateSelect = (date) => {
+    if (getAvailableSlotsForDate(date, availabilityConfig).length === 0) return
     setError('')
     setSelectedDate(date)
     setSelectedTime(null)
@@ -156,6 +177,9 @@ export default function BookingModal({ isOpen, onClose }) {
   }
 
   const isSlotStillAvailable = async (dateString, time) => {
+    if (!getAvailableSlotsForDate(parseDateKey(dateString), availabilityConfig).includes(time)) {
+      return false
+    }
     const slotId = `${dateString}_${time.replace(':', '')}`
     const snapshot = await getDoc(doc(db, 'availability_blocks', slotId))
     return !snapshot.exists()
@@ -244,6 +268,7 @@ export default function BookingModal({ isOpen, onClose }) {
     setSuccess(false)
     setLoading(false)
     setLoadingSlots(false)
+    setLoadingAvailability(true)
   }
 
   const availableDates = getDaysFromNow(90)
@@ -276,7 +301,7 @@ export default function BookingModal({ isOpen, onClose }) {
         month: 'long',
       })
     : ''
-  const visibleTimeSlots = getTimeSlotsForDate(selectedDate)
+  const visibleTimeSlots = getAvailableSlotsForDate(selectedDate, availabilityConfig)
 
   if (!isOpen) return null
 
@@ -430,9 +455,9 @@ export default function BookingModal({ isOpen, onClose }) {
               </div>
             </div>
 
-            <button className="booking-modal-btn-next" onClick={handleNextStep} disabled={loading}>
-              <CalendarDays size={18} />
-              Elegir fecha y hora
+            <button className="booking-modal-btn-next" onClick={handleNextStep} disabled={loading || loadingAvailability}>
+              {loadingAvailability ? <Loader2 className="booking-modal-spinner" size={18} /> : <CalendarDays size={18} />}
+              {loadingAvailability ? 'Cargando agenda...' : 'Elegir fecha y hora'}
             </button>
           </div>
         ) : (
@@ -440,7 +465,7 @@ export default function BookingModal({ isOpen, onClose }) {
             <div className="booking-modal-header">
               <span className="booking-modal-step-indicator">Paso 2 de 2</span>
               <h2>Elige tu fecha y hora</h2>
-              <p>La agenda se abre los sábados. En semana solo se muestran horarios tarde/noche.</p>
+              <p>Consulta los días y horas disponibles publicados en la agenda.</p>
             </div>
 
             {error && <div className="booking-modal-error-message">{error}</div>}
@@ -473,16 +498,19 @@ export default function BookingModal({ isOpen, onClose }) {
             <div className="booking-modal-date-grid">
               {currentWeek.map((date) => {
                 const isSelected = selectedDate?.toDateString() === date.toDateString()
+                const isClosed = getAvailableSlotsForDate(date, availabilityConfig).length === 0
 
                 return (
                   <button
                     key={formatDateKey(date)}
-                    className={`booking-modal-date-card ${isSelected ? 'selected' : ''}`}
+                    className={`booking-modal-date-card ${isSelected ? 'selected' : ''} ${isClosed ? 'closed' : ''}`}
                     onClick={() => handleDateSelect(date)}
+                    disabled={isClosed}
+                    aria-label={`${date.toLocaleDateString('es-CL')} - ${isClosed ? 'cerrado' : 'con disponibilidad'}`}
                   >
                     <span>{date.toLocaleDateString('es-CL', { weekday: 'short' })}</span>
                     <strong>{date.getDate()}</strong>
-                    <small>{date.toLocaleDateString('es-CL', { month: 'short' })}</small>
+                    <small>{isClosed ? 'Cerrado' : date.toLocaleDateString('es-CL', { month: 'short' })}</small>
                   </button>
                 )
               })}
@@ -498,6 +526,10 @@ export default function BookingModal({ isOpen, onClose }) {
                 <div className="booking-modal-loading-slots">
                   <Loader2 className="booking-modal-spinner" size={20} />
                   Cargando horarios disponibles...
+                </div>
+              ) : visibleTimeSlots.length === 0 ? (
+                <div className="booking-modal-no-slots">
+                  {selectedDate ? 'Este día está cerrado.' : 'Selecciona un día con disponibilidad.'}
                 </div>
               ) : (
                 <div className="booking-modal-time-grid">

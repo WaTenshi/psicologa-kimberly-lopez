@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { collection, getDocs, deleteDoc, doc, updateDoc, addDoc, query, orderBy } from 'firebase/firestore'
-import { MdAdd, MdClose, MdDelete, MdEdit, MdSearch } from 'react-icons/md'
+import { MdAdd, MdDelete, MdEdit, MdSearch } from 'react-icons/md'
 import { db } from '../config/firebase'
+import { Drawer, EmptyState, PageHeader } from './AdminUI'
 
 const SESSION_STATUSES = [
   { value: 'realizada', label: 'Realizada', color: '#10b981' },
@@ -315,23 +316,33 @@ export default function SessionHistory() {
 
   return (
     <div className="session-history clinical-session-history">
-      <div className="session-header">
-        <div>
-          <h2>Historial clínico</h2>
-          <p>Sesiones vinculadas a cada ficha, evolución, acuerdos y próximas acciones.</p>
-        </div>
-        <button
-          className="new-session-btn"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? <><MdClose /> Cerrar registro</> : <><MdAdd /> Nueva sesión clínica</>}
-        </button>
-      </div>
+      <PageHeader
+        eyebrow="Continuidad terapéutica"
+        title="Sesiones"
+        description="Evolución, acuerdos y próximas acciones vinculadas a cada ficha clínica."
+        actions={(
+          <button className="new-session-btn" onClick={() => setShowForm(true)}>
+            <MdAdd /> Nueva sesión
+          </button>
+        )}
+      />
 
       {error && <div className="error-banner">{error}</div>}
 
-      {showForm && (
-        <div className="session-form-container clinical-form-container session-clinical-form">
+      <Drawer
+        open={showForm}
+        onClose={resetForm}
+        title={editingId ? 'Editar sesión clínica' : 'Nueva sesión clínica'}
+        footer={(
+          <>
+            <button className="cancel-btn" onClick={resetForm} disabled={loading}>Cancelar</button>
+            <button className="save-btn" onClick={handleSaveSession} disabled={loading}>
+              {loading ? 'Guardando...' : editingId ? 'Actualizar sesión' : 'Guardar sesión'}
+            </button>
+          </>
+        )}
+      >
+        <div className="session-form-container clinical-form-container session-clinical-form drawer-form">
           <div className="clinical-form-heading">
             <div>
               <span>{editingId ? 'Edición de sesión' : 'Nuevo registro clínico'}</span>
@@ -365,16 +376,8 @@ export default function SessionHistory() {
             </section>
           ))}
 
-          <div className="form-actions sticky-form-actions">
-            <button className="cancel-btn" onClick={resetForm} disabled={loading}>
-              Cancelar
-            </button>
-            <button className="save-btn" onClick={handleSaveSession} disabled={loading}>
-              {loading ? 'Guardando...' : editingId ? 'Actualizar sesión' : 'Guardar sesión'}
-            </button>
-          </div>
         </div>
-      )}
+      </Drawer>
 
       <div className="session-toolbar">
         <div className="session-filters">
@@ -422,7 +425,11 @@ export default function SessionHistory() {
         {loading ? (
           <p className="loading">Cargando sesiones...</p>
         ) : sessionsByPatient.length === 0 ? (
-          <p className="no-sessions">No hay sesiones registradas</p>
+          <EmptyState
+            title="No hay sesiones registradas"
+            description="Registra la primera sesión para construir la continuidad clínica."
+            action={<button className="new-session-btn" onClick={() => setShowForm(true)}><MdAdd /> Nueva sesión</button>}
+          />
         ) : (
           <div className="sessions-timeline">
             {sessionsByPatient.map((session) => {

@@ -16,9 +16,6 @@
   position: fixed;
   inset: 0;
   z-index: 999;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
   color: var(--admin-text);
   background: var(--admin-bg);
 }
@@ -113,6 +110,30 @@
   border-radius: 8px;
 }
 
+.today-block-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.today-block-heading h3 {
+  margin: 0;
+}
+
+.today-block-heading button {
+  display: grid;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: #8a5f36;
+  background: #fff;
+  border: 1px solid #e6ddd7;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
 .today-block h3 {
   display: flex;
   align-items: center;
@@ -175,9 +196,9 @@
 
 .pipeline-columns {
   display: grid;
-  grid-template-columns: repeat(6, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 10px;
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .pipeline-column {
@@ -449,6 +470,10 @@
 }
 
 .main-tabs-container {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  flex-shrink: 0;
   background: var(--admin-surface);
   border-bottom: 1px solid var(--admin-border);
   overflow-x: auto;
@@ -1751,6 +1776,212 @@
 
   .session-actions {
     justify-content: flex-end;
+  }
+}
+
+/* Admin application shell and responsive module layout */
+.admin-module,
+.dashboard-analytics,
+.patient-management,
+.session-history,
+.quick-notes,
+.availability-management {
+  width: min(100%, 1680px);
+  min-height: auto;
+  margin: 0 auto;
+  padding: clamp(16px, 2.4vw, 32px);
+  overflow: visible;
+}
+
+.admin-global-error {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  margin: 16px clamp(16px, 2.4vw, 32px) 0;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+}
+
+.admin-controls.admin-section-toolbar {
+  position: sticky;
+  top: 12px;
+  z-index: 20;
+  padding: 10px;
+}
+
+.view-container {
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.appointment-form-container.drawer-form {
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.patient-form-container.drawer-form,
+.session-form-container.drawer-form {
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.drawer-detail.clinical-modal-content {
+  width: 100%;
+}
+
+.appointment-form-container.drawer-form .form-grid {
+  margin-bottom: 0;
+}
+
+.dashboard-analytics {
+  overflow: visible;
+}
+
+.analytics-cards {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.today-panel {
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.today-panel-header h2 {
+  font-size: clamp(1.35rem, 2.3vw, 1.8rem);
+}
+
+.today-panel-header p {
+  margin: 6px 0 0;
+  color: #667085;
+  font-size: 0.82rem;
+  text-transform: capitalize;
+}
+
+.today-grid {
+  grid-template-columns: repeat(5, minmax(180px, 1fr));
+}
+
+.today-block {
+  min-height: 150px;
+  border-radius: 10px;
+}
+
+.dashboard-block {
+  min-height: 280px;
+  border-radius: 12px;
+}
+
+.block-content {
+  max-height: none;
+  overflow: visible;
+}
+
+.monthly-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.monthly-summary-item {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  background: #faf7f3;
+  border: 1px solid #eadfd7;
+  border-radius: 10px;
+}
+
+.monthly-summary-item span {
+  color: #667085;
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.monthly-summary-item strong {
+  color: #2f261e;
+  font-size: 1.15rem;
+}
+
+.patient-management,
+.session-history,
+.quick-notes {
+  display: block;
+}
+
+.patients-container,
+.sessions-container,
+.notes-container,
+.clinical-sessions-container {
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+@container admin-content (max-width: 1320px) {
+  .today-grid {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
+}
+
+@container admin-content (max-width: 980px) {
+  .analytics-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .today-grid {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+
+  .patient-toolbar,
+  .session-toolbar,
+  .session-patient-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container admin-content (max-width: 700px) {
+  .admin-module,
+  .dashboard-analytics,
+  .patient-management,
+  .session-history,
+  .quick-notes,
+  .availability-management {
+    padding: 16px;
+  }
+
+  .analytics-cards,
+  .today-grid,
+  .dashboard-grid,
+  .monthly-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pipeline-columns,
+  .patients-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-pipeline,
+  .patients-container,
+  .sessions-container,
+  .notes-container {
+    padding: 12px;
+  }
+
+  .today-panel-header {
+    align-items: flex-start;
   }
 }
 

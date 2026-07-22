@@ -1,6 +1,6 @@
 .weekly-view {
   display: flex;
-  height: 100%;
+  height: auto;
   min-height: 0;
   flex-direction: column;
   gap: 14px;
@@ -21,7 +21,7 @@
 }
 
 .nav-btn {
-  min-height: 38px;
+  min-height: 44px;
   padding: 0 14px;
   color: #2f261e;
   background: #ffffff;
@@ -37,9 +37,9 @@
 }
 
 .schedule-table {
-  flex: 1;
+  flex: 0 0 auto;
   min-height: 0;
-  overflow: hidden;
+  overflow-x: auto;
   background: #ffffff;
   border: 1px solid #e8d7c2;
   border-radius: 8px;
@@ -92,8 +92,8 @@
 }
 
 .schedule-body {
-  height: calc(100% - 59px);
-  overflow: auto;
+  height: auto;
+  overflow: visible;
 }
 
 .time-row {

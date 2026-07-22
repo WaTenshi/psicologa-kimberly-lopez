@@ -1,6 +1,6 @@
 .monthly-view {
   display: flex;
-  height: 100%;
+  height: auto;
   min-height: 0;
   flex-direction: column;
   gap: 14px;
@@ -21,7 +21,7 @@
 }
 
 .calendar {
-  flex: 1;
+  flex: 0 0 auto;
   min-height: 0;
   overflow: hidden;
   background: #ffffff;
@@ -52,8 +52,8 @@
 }
 
 .calendar-body {
-  height: calc(100% - 45px);
-  overflow: auto;
+  height: auto;
+  overflow: visible;
 }
 
 .calendar-day {

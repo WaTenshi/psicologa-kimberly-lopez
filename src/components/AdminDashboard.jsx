@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { collection, deleteDoc, doc, updateDoc, addDoc, setDoc } from 'firebase/firestore'
 import { signOut } from 'firebase/auth'
-import { MdDashboard, MdEvent, MdGroup, MdDocumentScanner, MdNotes, MdLogout, MdCalendarToday, MdCalendarMonth, MdClose, MdAdd, MdEdit, MdDelete } from 'react-icons/md'
+import { MdCalendarToday, MdCalendarMonth, MdClose, MdAdd, MdEdit, MdDelete } from 'react-icons/md'
 import { db, auth } from '../config/firebase'
 import WeeklyView from './WeeklyView'
 import MonthlyView from './MonthlyView'
@@ -9,6 +9,10 @@ import PatientManagement from './PatientManagement'
 import SessionHistory from './SessionHistory'
 import QuickNotes from './QuickNotes'
 import DashboardAnalytics from './DashboardAnalytics'
+import AvailabilityManagement from './AvailabilityManagement'
+import AdminShell from './AdminShell'
+import { Drawer, PageHeader, SectionToolbar } from './AdminUI'
+import useAdminNavigation, { clearAdminPanelFromUrl } from '../hooks/useAdminNavigation'
 import '../styles/AdminDashboard.css'
 
 const APPOINTMENT_TYPES = [
@@ -66,7 +70,8 @@ const INITIAL_APPOINTMENT_FORM = {
 }
 
 export default function AdminDashboard({ onLogout }) {
-  const [mainTab, setMainTab] = useState('dashboard') // 'dashboard' | 'appointments' | 'patients' | 'sessions' | 'notes'
+  const contentRef = useRef(null)
+  const { activePanel: mainTab, navigate } = useAdminNavigation(contentRef)
   const [view, setView] = useState('week') // 'week' | 'month'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -205,13 +210,39 @@ export default function AdminDashboard({ onLogout }) {
   }
 
   const handleLogout = async () => {
+    const navigationEvent = new CustomEvent('admin:before-panel-change', {
+      cancelable: true,
+      detail: { from: mainTab, to: 'logout' },
+    })
+    if (!window.dispatchEvent(navigationEvent)) return
+
     try {
       await signOut(auth)
+      clearAdminPanelFromUrl()
       onLogout()
     } catch (err) {
       console.error('Error al logout:', err)
       setError('Error al cerrar sesión')
     }
+  }
+
+  const handleCreateAppointment = () => {
+    if (!handlePanelNavigate('appointments')) return
+    setFormData(INITIAL_APPOINTMENT_FORM)
+    setEditingId(null)
+    setEditingOriginalSlot(null)
+    setSelectedAppointment(null)
+    setShowNewAppointmentForm(true)
+  }
+
+  const handlePanelNavigate = (panel) => {
+    const navigationEvent = new CustomEvent('admin:before-panel-change', {
+      cancelable: true,
+      detail: { from: mainTab, to: panel },
+    })
+    if (!window.dispatchEvent(navigationEvent)) return false
+    navigate(panel)
+    return true
   }
 
   // Horas disponibles
@@ -221,63 +252,31 @@ export default function AdminDashboard({ onLogout }) {
   ]
 
   return (
-    <div className="admin-dashboard">
-      <div className="admin-header">
-        <div className="admin-title">
-          <h1>Panel de Administración</h1>
-          <p>Kimberly López - Consulta Psicológica</p>
-        </div>
-        <button className="logout-btn" onClick={handleLogout}>
-          <MdLogout />
-          Cerrar Sesión
-        </button>
-      </div>
-
-      {error && <div className="error-banner">{error}</div>}
-
-      {/* Main Navigation Tabs */}
-      <div className="main-tabs-container">
-        <div className="main-tabs">
-          <button
-            className={`main-tab-btn ${mainTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setMainTab('dashboard')}
-          >
-            <MdDashboard /> Dashboard
-          </button>
-          <button
-            className={`main-tab-btn ${mainTab === 'appointments' ? 'active' : ''}`}
-            onClick={() => setMainTab('appointments')}
-          >
-            <MdEvent /> Citas
-          </button>
-          <button
-            className={`main-tab-btn ${mainTab === 'patients' ? 'active' : ''}`}
-            onClick={() => setMainTab('patients')}
-          >
-            <MdGroup /> Pacientes
-          </button>
-          <button
-            className={`main-tab-btn ${mainTab === 'sessions' ? 'active' : ''}`}
-            onClick={() => setMainTab('sessions')}
-          >
-            <MdDocumentScanner /> Sesiones
-          </button>
-          <button
-            className={`main-tab-btn ${mainTab === 'notes' ? 'active' : ''}`}
-            onClick={() => setMainTab('notes')}
-          >
-            <MdNotes /> Notas
-          </button>
-        </div>
-      </div>
+    <AdminShell
+      activePanel={mainTab}
+      contentRef={contentRef}
+      onLogout={handleLogout}
+      onNavigate={handlePanelNavigate}
+      primaryAction={['dashboard', 'appointments'].includes(mainTab) ? {
+        label: 'Nueva cita',
+        onClick: handleCreateAppointment,
+      } : null}
+      userEmail={auth.currentUser?.email}
+    >
+      {error && <div className="error-banner admin-global-error">{error}</div>}
 
       {/* Dashboard Section */}
-      {mainTab === 'dashboard' && <DashboardAnalytics />}
+      {mainTab === 'dashboard' && <DashboardAnalytics onNavigate={handlePanelNavigate} />}
 
       {/* Appointments Section */}
       {mainTab === 'appointments' && (
-        <>
-          <div className="admin-controls">
+        <section className="admin-module admin-appointments-module">
+          <PageHeader
+            eyebrow="Agenda clínica"
+            title="Citas"
+            description="Organiza la agenda, revisa cada reserva y crea bloqueos administrativos."
+          />
+          <SectionToolbar className="admin-controls">
             <div className="view-tabs">
               <button
                 className={`tab-btn ${view === 'week' ? 'active' : ''}`}
@@ -295,16 +294,26 @@ export default function AdminDashboard({ onLogout }) {
 
             <button
               className="new-appointment-btn"
-              onClick={() => setShowNewAppointmentForm(!showNewAppointmentForm)}
+              onClick={showNewAppointmentForm ? handleCancel : handleCreateAppointment}
             >
               {showNewAppointmentForm ? <><MdClose /> Cancelar</> : <><MdAdd /> Nueva Cita</>}
             </button>
-          </div>
+          </SectionToolbar>
 
-          {showNewAppointmentForm && (
-            <div className="appointment-form-container">
-              <h3>{editingId ? 'Editar Cita' : 'Nueva Cita'}</h3>
-
+          <Drawer
+            open={showNewAppointmentForm}
+            onClose={handleCancel}
+            title={editingId ? 'Editar cita' : 'Nueva cita'}
+            footer={(
+              <>
+                <button className="cancel-btn" onClick={handleCancel} disabled={loading}>Cancelar</button>
+                <button className="save-btn" onClick={handleSaveAppointment} disabled={loading}>
+                  {loading ? 'Guardando...' : editingId ? 'Actualizar cita' : 'Crear cita'}
+                </button>
+              </>
+            )}
+          >
+            <div className="appointment-form-container drawer-form">
               <div className="form-grid">
                 <div className="form-group">
                   <label>Tipo *</label>
@@ -512,17 +521,8 @@ export default function AdminDashboard({ onLogout }) {
                   />
                 </div>
               </div>
-
-              <div className="form-actions">
-                <button className="save-btn" onClick={handleSaveAppointment} disabled={loading}>
-                  {loading ? 'Guardando...' : editingId ? 'Actualizar Cita' : 'Crear Cita'}
-                </button>
-                <button className="cancel-btn" onClick={handleCancel} disabled={loading}>
-                  Cancelar
-                </button>
-              </div>
             </div>
-          )}
+          </Drawer>
 
           <div className="view-container">
             {view === 'week' ? (
@@ -534,14 +534,18 @@ export default function AdminDashboard({ onLogout }) {
 
           {/* Modal de detalles de cita */}
           {selectedAppointment && (
-            <div className="modal-overlay" onClick={() => setSelectedAppointment(null)}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={() => setSelectedAppointment(null)}>
-                  <MdClose />
-                </button>
-
-                <h2>Detalles de la Cita</h2>
-
+            <Drawer
+              open
+              onClose={() => setSelectedAppointment(null)}
+              title="Detalles de la cita"
+              size="medium"
+              footer={(
+                <>
+                  <button className="delete-btn" onClick={handleDeleteAppointment}><MdDelete /> Eliminar</button>
+                  <button className="edit-btn" onClick={handleEditAppointment}><MdEdit /> Editar</button>
+                </>
+              )}
+            >
                 <div className="appointment-details-grid">
                   <div className="detail-item">
                     <label>Tipo</label>
@@ -615,19 +619,14 @@ export default function AdminDashboard({ onLogout }) {
                     <p>{selectedAppointment.observaciones_admin || 'Sin observaciones'}</p>
                   </div>
                 </div>
-
-                <div className="modal-actions">
-                  <button className="edit-btn" onClick={handleEditAppointment}>
-                    <MdEdit /> Editar
-                  </button>
-                  <button className="delete-btn" onClick={handleDeleteAppointment}>
-                    <MdDelete /> Eliminar
-                  </button>
-                </div>
-              </div>
-            </div>
+            </Drawer>
           )}
-        </>
+        </section>
+      )}
+
+      {/* Availability Section */}
+      {mainTab === 'availability' && (
+        <AvailabilityManagement />
       )}
 
       {/* Patients Section */}
@@ -638,7 +637,7 @@ export default function AdminDashboard({ onLogout }) {
 
       {/* Notes Section */}
       {mainTab === 'notes' && <QuickNotes />}
-    </div>
+    </AdminShell>
   )
 }
 

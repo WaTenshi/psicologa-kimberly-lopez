@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore'
-import { MdCalendarToday, MdNotifications, MdPayment, MdPersonSearch, MdNotes } from 'react-icons/md'
+import { MdArrowForward, MdCalendarToday, MdNotifications, MdPayment, MdPersonSearch, MdNotes } from 'react-icons/md'
 import { db } from '../config/firebase'
 
 const todayKey = () => new Date().toISOString().split('T')[0]
@@ -11,7 +11,7 @@ const addDaysKey = (days) => {
   return date.toISOString().split('T')[0]
 }
 
-export default function TodayPanel() {
+export default function TodayPanel({ onNavigate }) {
   const [appointments, setAppointments] = useState([])
   const [patients, setPatients] = useState([])
   const [notes, setNotes] = useState([])
@@ -82,8 +82,9 @@ export default function TodayPanel() {
     <section className="today-panel">
       <div className="today-panel-header">
         <div>
-          <span>Panel del día</span>
-          <h2>Hoy, {new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' })}</h2>
+          <span>Prioridades</span>
+          <h2>Panel de hoy</h2>
+          <p>{new Date().toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
         </div>
         <div className="today-panel-kpis">
           <strong>{data.todayAppointments.length}</strong>
@@ -92,7 +93,7 @@ export default function TodayPanel() {
       </div>
 
       <div className="today-grid">
-        <TodayBlock icon={<MdCalendarToday />} title="Próximas sesiones">
+        <TodayBlock icon={<MdCalendarToday />} title="Próximas sesiones" onOpen={() => onNavigate?.('appointments')}>
           {data.todayAppointments.length === 0 ? (
             <p className="no-data">No hay sesiones para hoy</p>
           ) : (
@@ -106,7 +107,7 @@ export default function TodayPanel() {
           )}
         </TodayBlock>
 
-        <TodayBlock icon={<MdNotifications />} title="Recordatorios 24h">
+        <TodayBlock icon={<MdNotifications />} title="Recordatorios 24h" onOpen={() => onNavigate?.('appointments')}>
           {data.remindersDue.length === 0 ? (
             <p className="no-data">Sin recordatorios pendientes</p>
           ) : (
@@ -120,7 +121,7 @@ export default function TodayPanel() {
           )}
         </TodayBlock>
 
-        <TodayBlock icon={<MdPayment />} title="Pagos pendientes">
+        <TodayBlock icon={<MdPayment />} title="Pagos pendientes" onOpen={() => onNavigate?.('appointments')}>
           {data.pendingPayments.length === 0 ? (
             <p className="no-data">No hay pagos pendientes</p>
           ) : (
@@ -134,7 +135,7 @@ export default function TodayPanel() {
           )}
         </TodayBlock>
 
-        <TodayBlock icon={<MdPersonSearch />} title="Pacientes por contactar">
+        <TodayBlock icon={<MdPersonSearch />} title="Pacientes por contactar" onOpen={() => onNavigate?.('patients')}>
           {data.patientsToContact.length === 0 ? (
             <p className="no-data">Sin contactos urgentes</p>
           ) : (
@@ -148,7 +149,7 @@ export default function TodayPanel() {
           )}
         </TodayBlock>
 
-        <TodayBlock icon={<MdNotes />} title="Notas rápidas">
+        <TodayBlock icon={<MdNotes />} title="Notas rápidas" onOpen={() => onNavigate?.('notes')}>
           {notes.length === 0 ? (
             <p className="no-data">Sin notas recientes</p>
           ) : (
@@ -164,10 +165,13 @@ export default function TodayPanel() {
   )
 }
 
-function TodayBlock({ icon, title, children }) {
+function TodayBlock({ icon, title, children, onOpen }) {
   return (
     <article className="today-block">
-      <h3>{icon} {title}</h3>
+      <div className="today-block-heading">
+        <h3>{icon} {title}</h3>
+        <button onClick={onOpen} aria-label={`Abrir ${title}`}><MdArrowForward /></button>
+      </div>
       <div className="today-block-list">{children}</div>
     </article>
   )

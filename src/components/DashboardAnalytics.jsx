@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore'
-import { MdBarChart, MdGroup, MdNewReleases, MdTrendingUp, MdComputer, MdCalendarToday, MdDocumentScanner, MdPayment, MdEventBusy } from 'react-icons/md'
+import { MdBarChart, MdGroup, MdCalendarToday, MdDocumentScanner, MdPayment } from 'react-icons/md'
 import { db } from '../config/firebase'
 import TodayPanel from './TodayPanel'
+import { EmptyState, PageHeader, StatCard } from './AdminUI'
 
-export default function DashboardAnalytics() {
+export default function DashboardAnalytics({ onNavigate }) {
   const [upcomingAppointments, setUpcomingAppointments] = useState([])
   const [recentPatients, setRecentPatients] = useState([])
   const [recentSessions, setRecentSessions] = useState([])
@@ -198,76 +199,27 @@ export default function DashboardAnalytics() {
 
   return (
     <div className="dashboard-analytics">
+      <PageHeader
+        eyebrow="Resumen operativo"
+        title="Tu consulta, de un vistazo"
+        description={new Date().toLocaleDateString('es-CL', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        })}
+      />
       {error && <div className="error-banner">{error}</div>}
-
-      <TodayPanel />
 
       {/* Analytics Cards */}
       <div className="analytics-cards">
-        <div className="analytics-card">
-          <div className="card-icon"><MdBarChart size={32} /></div>
-          <div className="card-content">
-            <div className="card-value">{analytics.sessionsThisMonth}</div>
-            <div className="card-label">Sesiones este mes</div>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <div className="card-icon"><MdGroup size={32} /></div>
-          <div className="card-content">
-            <div className="card-value">{analytics.activePatients}</div>
-            <div className="card-label">Pacientes activos</div>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <div className="card-icon"><MdNewReleases size={32} /></div>
-          <div className="card-content">
-            <div className="card-value">{analytics.newPatients}</div>
-            <div className="card-label">Nuevos pacientes</div>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <div className="card-icon"><MdTrendingUp size={32} /></div>
-          <div className="card-content">
-            <div className="card-value">{totalSessions}</div>
-            <div className="card-label">Total sesiones</div>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <div className="card-icon"><MdPayment size={32} /></div>
-          <div className="card-content">
-            <div className="card-value">{formatCurrency(analytics.monthlyRevenue)}</div>
-            <div className="card-label">Ingresos pagados del mes</div>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <div className="card-icon"><MdEventBusy size={32} /></div>
-          <div className="card-content">
-            <div className="card-value">{analytics.cancellationsThisMonth}</div>
-            <div className="card-label">Canceladas/no asistió</div>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <div className="card-icon"><MdPayment size={32} /></div>
-          <div className="card-content">
-            <div className="card-value">{formatCurrency(analytics.pendingPayments)}</div>
-            <div className="card-label">Deuda acumulada</div>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <div className="card-icon"><MdGroup size={32} /></div>
-          <div className="card-content">
-            <div className="card-value">{analytics.patientsWithoutNextAppointment}</div>
-            <div className="card-label">Activos sin próxima hora</div>
-          </div>
-        </div>
+        <StatCard icon={<MdBarChart />} value={analytics.sessionsThisMonth} label="Sesiones este mes" tone="brown" />
+        <StatCard icon={<MdGroup />} value={analytics.activePatients} label="Pacientes activos" tone="blue" />
+        <StatCard icon={<MdPayment />} value={formatCurrency(analytics.monthlyRevenue)} label="Ingresos pagados" tone="green" />
+        <StatCard icon={<MdPayment />} value={formatCurrency(analytics.pendingPayments)} label="Pagos pendientes" tone="amber" />
       </div>
+
+      <TodayPanel onNavigate={onNavigate} />
 
       {/* Main Grid */}
       <div className="dashboard-grid">
@@ -276,7 +228,7 @@ export default function DashboardAnalytics() {
           <h3><MdCalendarToday /> Próximas Citas</h3>
           <div className="block-content">
             {upcomingAppointments.length === 0 ? (
-              <p className="no-data">No hay citas próximas</p>
+              <EmptyState title="No hay citas próximas" description="Cuando se agende una cita aparecerá aquí." />
             ) : (
               <div className="appointments-list">
                 {upcomingAppointments.map((apt) => (
@@ -287,7 +239,7 @@ export default function DashboardAnalytics() {
                     </div>
                     <div className="appointment-info">
                       <p className="patient-name">{apt.nombre} {apt.apellido}</p>
-                      <p className="appointment-motivo">{apt.motivo.substring(0, 50)}...</p>
+                      <p className="appointment-motivo">{(apt.motivo || 'Sin motivo registrado').substring(0, 50)}</p>
                     </div>
                   </div>
                 ))}
@@ -301,7 +253,7 @@ export default function DashboardAnalytics() {
           <h3><MdGroup /> Últimos Pacientes</h3>
           <div className="block-content">
             {recentPatients.length === 0 ? (
-              <p className="no-data">No hay pacientes</p>
+              <EmptyState title="Aún no hay pacientes" description="Las fichas nuevas aparecerán en este bloque." />
             ) : (
               <div className="patients-list">
                 {recentPatients.map((patient) => (
@@ -332,7 +284,7 @@ export default function DashboardAnalytics() {
           <h3><MdDocumentScanner /> Últimas Sesiones</h3>
           <div className="block-content">
             {recentSessions.length === 0 ? (
-              <p className="no-data">No hay sesiones registradas</p>
+              <EmptyState title="Sin sesiones registradas" description="Registra una sesión clínica para comenzar el historial." />
             ) : (
               <div className="sessions-list">
                 {recentSessions.map((session) => (
@@ -349,43 +301,15 @@ export default function DashboardAnalytics() {
           </div>
         </div>
 
-        {/* Analytics Chart - Online vs Presential */}
-        <div className="dashboard-block">
-          <h3><MdComputer /> Sesiones: Online vs Presencial</h3>
-          <div className="block-content">
-            {totalSessions === 0 ? (
-              <p className="no-data">No hay datos de sesiones</p>
-            ) : (
-              <div className="chart-container">
-                <div className="chart-bars">
-                  <div className="bar-group">
-                    <div className="bar-label">Online</div>
-                    <div className="bar-wrapper">
-                      <div
-                        className="bar online"
-                        style={{ height: `${onlinePercent}%` }}
-                      ></div>
-                      <div className="bar-value">
-                        {analytics.onlineSessions} ({Math.round(onlinePercent)}%)
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bar-group">
-                    <div className="bar-label">Presencial</div>
-                    <div className="bar-wrapper">
-                      <div
-                        className="bar presential"
-                        style={{ height: `${presentialPercent}%` }}
-                      ></div>
-                      <div className="bar-value">
-                        {analytics.presentialSessions} ({Math.round(presentialPercent)}%)
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+        <div className="dashboard-block monthly-summary-block">
+          <h3><MdBarChart /> Resumen mensual</h3>
+          <div className="monthly-summary-grid">
+            <SummaryItem label="Pacientes nuevos" value={analytics.newPatients} />
+            <SummaryItem label="Canceladas / no asistió" value={analytics.cancellationsThisMonth} />
+            <SummaryItem label="Sin próxima hora" value={analytics.patientsWithoutNextAppointment} />
+            <SummaryItem label="Sesiones realizadas" value={analytics.attendanceThisMonth} />
+            <SummaryItem label="Online" value={`${analytics.onlineSessions} · ${Math.round(onlinePercent)}%`} />
+            <SummaryItem label="Presencial" value={`${analytics.presentialSessions} · ${Math.round(presentialPercent)}%`} />
           </div>
         </div>
       </div>
@@ -414,6 +338,15 @@ function getStatusLabel(status) {
     alta_terapeutica: 'Alta',
   }
   return labels[status] || status
+}
+
+function SummaryItem({ label, value }) {
+  return (
+    <div className="monthly-summary-item">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  )
 }
 
 function formatCurrency(value) {
