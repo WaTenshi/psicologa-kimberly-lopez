@@ -1,0 +1,492 @@
+.service-management {
+  padding: clamp(20px, 3vw, 36px);
+}
+
+.services-primary-button,
+.services-secondary-button,
+.services-admin-actions button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.services-primary-button {
+  color: #fff;
+  background: #8a5f36;
+  border: 1px solid #8a5f36;
+  box-shadow: 0 8px 18px rgba(138, 95, 54, 0.18);
+}
+
+.services-primary-button:hover:not(:disabled) {
+  background: #704824;
+}
+
+.services-primary-button:disabled,
+.services-secondary-button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.services-secondary-button {
+  color: #475467;
+  background: #fff;
+  border: 1px solid #d8cec7;
+}
+
+.services-admin-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.services-admin-list {
+  display: grid;
+  gap: 12px;
+}
+
+.services-admin-card,
+.services-admin-panel,
+.services-admin-loading {
+  background: #fff;
+  border: 1px solid #e6ddd7;
+  border-radius: 14px;
+  box-shadow: 0 8px 26px rgba(47, 38, 30, 0.045);
+}
+
+.services-admin-card {
+  overflow: hidden;
+}
+
+.services-admin-card.is-hidden {
+  background: #faf9f8;
+}
+
+.services-admin-card-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+}
+
+.services-admin-order {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  color: #704824;
+  background: #f8eee3;
+  border-radius: 10px;
+  font-weight: 900;
+}
+
+.services-admin-copy {
+  min-width: 0;
+}
+
+.services-admin-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.services-admin-title-row h3 {
+  margin: 0;
+  color: #2f261e;
+  font-size: 1.1rem;
+}
+
+.services-status,
+.services-offer-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.services-status {
+  color: #667085;
+  background: #f2f4f7;
+}
+
+.services-status.is-active {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.services-offer-badge {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.services-admin-meta {
+  display: block;
+  margin-top: 6px;
+  color: #8a5f36;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.services-admin-copy p {
+  max-width: 760px;
+  margin: 7px 0 0;
+  color: #667085;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.services-admin-price {
+  display: grid;
+  min-width: 140px;
+  justify-items: end;
+  gap: 4px;
+  text-align: right;
+}
+
+.services-admin-price strong {
+  color: #2f261e;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+}
+
+.services-admin-price del,
+.services-admin-price small {
+  color: #667085;
+  font-size: 0.73rem;
+}
+
+.services-admin-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #fcfaf8;
+  border-top: 1px solid #eee7e2;
+}
+
+.services-admin-actions button {
+  min-height: 40px;
+  padding: 0 12px;
+  color: #475467;
+  background: #fff;
+  border: 1px solid #d8cec7;
+  font-size: 0.78rem;
+}
+
+.services-admin-actions button:hover {
+  color: #704824;
+  border-color: #bda58f;
+}
+
+.services-admin-actions button.is-danger {
+  color: #b42318;
+}
+
+.services-admin-loading {
+  padding: 42px;
+  color: #667085;
+  text-align: center;
+}
+
+.services-admin-form {
+  display: grid;
+  gap: 18px;
+}
+
+.services-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.services-form-group {
+  display: grid;
+  gap: 7px;
+}
+
+.services-form-group label {
+  color: #344054;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.services-form-group input,
+.services-form-group textarea,
+.services-form-group select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: #1f2937;
+  background: #fff;
+  border: 1px solid #d8cec7;
+  border-radius: 9px;
+  font: inherit;
+}
+
+.services-form-group textarea {
+  resize: vertical;
+}
+
+.services-form-group small,
+.services-switch-row small {
+  color: #667085;
+  font-size: 0.72rem;
+}
+
+.services-icon-picker {
+  position: relative;
+}
+
+.services-icon-trigger {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  width: 100%;
+  min-height: 50px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 6px 7px;
+  color: #344054;
+  background: #fff;
+  border: 1px solid #d8cec7;
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.services-icon-trigger:hover,
+.services-icon-trigger.is-open {
+  border-color: #a77b52;
+  box-shadow: 0 0 0 3px rgba(138, 95, 54, 0.12);
+}
+
+.services-icon-preview {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: #8a5f36;
+  background: #fbf3e9;
+  border: 1px solid #ead7c2;
+  border-radius: 9px;
+}
+
+.services-icon-chevron {
+  color: #667085;
+  font-size: 1.4rem;
+  transition: transform 150ms ease;
+}
+
+.services-icon-trigger.is-open .services-icon-chevron {
+  transform: rotate(180deg);
+}
+
+.services-icon-menu {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #d8cec7;
+  border-radius: 12px;
+  box-shadow: 0 18px 42px rgba(47, 38, 30, 0.18);
+  max-height: 300px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.services-icon-option {
+  display: grid;
+  min-width: 0;
+  min-height: 82px;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  padding: 8px 5px;
+  color: #667085;
+  background: #fcfaf8;
+  border: 1px solid #eee5de;
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+  text-align: center;
+}
+
+.services-icon-option > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  color: #8a5f36;
+  background: #fbf3e9;
+  border-radius: 9px;
+}
+
+.services-icon-option small {
+  overflow: hidden;
+  color: inherit;
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.services-icon-option:hover {
+  color: #704824;
+  background: #fbf3e9;
+  border-color: #d9baa0;
+}
+
+.services-icon-option.is-selected {
+  color: #fff;
+  background: #8a5f36;
+  border-color: #8a5f36;
+  box-shadow: 0 7px 16px rgba(138, 95, 54, 0.2);
+}
+
+.services-icon-option.is-selected > span {
+  color: #704824;
+  background: #fff5e9;
+}
+
+.services-money-input {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  border: 1px solid #d8cec7;
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.services-money-input span {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  color: #704824;
+  background: #f8f3ed;
+  font-weight: 900;
+}
+
+.services-money-input input {
+  border: 0;
+  border-radius: 0;
+}
+
+.services-switch-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  cursor: pointer;
+}
+
+.services-switch-row input {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  accent-color: #8a5f36;
+}
+
+.services-switch-row > span {
+  display: grid;
+  gap: 3px;
+}
+
+.services-switch-row strong {
+  color: #344054;
+  font-size: 0.85rem;
+}
+
+.services-discount-box {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  background: #faf8f5;
+  border: 1px solid #e6ddd7;
+  border-radius: 12px;
+}
+
+.services-discount-box.is-enabled {
+  background: #fff8ed;
+  border-color: #edcda9;
+}
+
+.services-form-error {
+  padding: 12px 14px;
+  color: #991b1b;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+@container admin-content (max-width: 760px) {
+  .services-admin-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .services-admin-card-main {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .services-admin-price {
+    grid-column: 2;
+    justify-items: start;
+    text-align: left;
+  }
+}
+
+@container admin-content (max-width: 520px) {
+  .service-management {
+    padding: 16px;
+  }
+
+  .services-admin-card-main {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .services-admin-order {
+    width: 36px;
+    height: 36px;
+  }
+
+  .services-admin-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 12px 16px;
+  }
+
+  .services-admin-actions button.is-danger {
+    grid-column: 1 / -1;
+  }
+
+  .services-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .services-icon-menu {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .services-icon-chevron {
+    transition: none;
+  }
+}

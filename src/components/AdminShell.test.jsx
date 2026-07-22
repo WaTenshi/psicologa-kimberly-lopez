@@ -34,11 +34,11 @@ describe('AdminShell', () => {
     expect(window.localStorage.getItem('kimberly.admin.sidebar.collapsed')).toBe('true')
   })
 
-  it('expone las seis secciones y delega la navegación', async () => {
+  it('expone las siete secciones y delega la navegación', async () => {
     const user = userEvent.setup()
-    render(<AdminShell {...defaultProps}>Contenido</AdminShell>)
+    const { container } = render(<AdminShell {...defaultProps}>Contenido</AdminShell>)
 
-    expect(screen.getAllByRole('button', { name: /Dashboard|Citas|Disponibilidad|Pacientes|Sesiones|Notas/ })).toHaveLength(6)
+    expect(container.querySelectorAll('.admin-nav-item')).toHaveLength(7)
     await user.click(screen.getByRole('button', { name: 'Citas' }))
 
     expect(defaultProps.onNavigate).toHaveBeenCalledWith('appointments')
@@ -53,5 +53,36 @@ describe('AdminShell', () => {
 
     await user.click(screen.getAllByRole('button', { name: 'Cerrar menú' })[0])
     expect(container.firstChild).not.toHaveClass('is-mobile-open')
+  })
+
+  it('ofrece un recorrido contextual para la sección activa', () => {
+    render(<AdminShell {...defaultProps} activePanel="patients">Contenido</AdminShell>)
+
+    const helpButton = screen.getByRole('button', { name: 'Ver ayuda de Pacientes' })
+    expect(helpButton).toHaveTextContent('Ayuda')
+    expect(helpButton).toHaveAttribute(
+      'title',
+      'Ver recorrido de Pacientes',
+    )
+  })
+
+  it('inicia el recorrido del módulo y permite cancelarlo con Escape', async () => {
+    const user = userEvent.setup()
+    window.matchMedia = vi.fn().mockReturnValue({ matches: true })
+    render(
+      <AdminShell {...defaultProps} activePanel="notes">
+        <div className="quick-notes">
+          <header className="admin-page-header">Encabezado de notas</header>
+          <div className="notes-input-container">Nueva nota</div>
+          <div className="notes-container">Notas guardadas</div>
+        </div>
+      </AdminShell>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Ver ayuda de Notas' }))
+    expect(await screen.findByRole('dialog')).toHaveTextContent('Notas rápidas')
+
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 })

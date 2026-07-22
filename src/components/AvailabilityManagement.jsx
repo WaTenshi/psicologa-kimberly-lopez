@@ -251,7 +251,7 @@ export default function AvailabilityManagement() {
       {materializedThrough && <p className="availability-security-note">Validación activa hasta el {formatFriendlyDate(materializedThrough)}.</p>}
       {error && <div className="availability-error">{error}</div>}
 
-      <div className="availability-card">
+      <div className="availability-card" data-tour="weekly-availability">
         <div className="availability-card-title">
           <div>
             <h3>Horario semanal habitual</h3>
@@ -338,7 +338,7 @@ export default function AvailabilityManagement() {
         </div>
       </div>
 
-      <div className="availability-card">
+      <div className="availability-card" data-tour="availability-rules">
         <div className="availability-card-title">
           <div>
             <h3>Regla masiva semanal</h3>

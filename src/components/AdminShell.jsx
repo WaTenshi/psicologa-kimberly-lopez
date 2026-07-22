@@ -8,17 +8,21 @@ import {
   MdDocumentScanner,
   MdEvent,
   MdGroup,
+  MdHelpOutline,
   MdLogout,
   MdMenu,
+  MdMedicalServices,
   MdNotes,
   MdSchedule,
 } from 'react-icons/md'
+import useAdminTour from '../hooks/useAdminTour'
 import '../styles/AdminShell.css'
 
 const ADMIN_NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: MdDashboard },
   { id: 'appointments', label: 'Citas', icon: MdEvent },
   { id: 'availability', label: 'Disponibilidad', icon: MdSchedule },
+  { id: 'services', label: 'Servicios y precios', icon: MdMedicalServices },
   { id: 'patients', label: 'Pacientes', icon: MdGroup },
   { id: 'sessions', label: 'Sesiones', icon: MdDocumentScanner },
   { id: 'notes', label: 'Notas', icon: MdNotes },
@@ -50,6 +54,7 @@ export default function AdminShell({
   const sidebarRef = useRef(null)
   const closeButtonRef = useRef(null)
   const activeItem = ADMIN_NAV_ITEMS.find((item) => item.id === activePanel) || ADMIN_NAV_ITEMS[0]
+  const startTour = useAdminTour(activePanel)
 
   useEffect(() => {
     try {
@@ -178,12 +183,23 @@ export default function AdminShell({
               <h1>{activeItem.label}</h1>
             </div>
           </div>
-          {primaryAction && (
-            <button className="admin-primary-action" onClick={primaryAction.onClick}>
-              {primaryAction.icon || <MdAdd />}
-              <span>{primaryAction.label}</span>
+          <div className="admin-topbar-actions">
+            <button
+              className="admin-tour-button"
+              onClick={startTour}
+              aria-label={`Ver ayuda de ${activeItem.label}`}
+              title={`Ver recorrido de ${activeItem.label}`}
+            >
+              <MdHelpOutline />
+              <span>Ayuda</span>
             </button>
-          )}
+            {primaryAction && (
+              <button className="admin-primary-action" onClick={primaryAction.onClick}>
+                {primaryAction.icon || <MdAdd />}
+                <span>{primaryAction.label}</span>
+              </button>
+            )}
+          </div>
         </header>
 
         <main ref={contentRef} className="admin-content" tabIndex="-1">

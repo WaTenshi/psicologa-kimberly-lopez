@@ -11,28 +11,110 @@ service cloud.firestore {
         ];
     }
 
+    function hasActiveDiscount(serviceData) {
+      return serviceData.discountEnabled == true
+        && serviceData.discountPrice > 0
+        && serviceData.discountPrice < serviceData.price
+        && request.time <= serviceData.discountEndsAt;
+    }
+
+    function validPublishedService(data) {
+      let serviceData = get(/databases/$(database)/documents/services/$(data.servicio)).data;
+      return serviceData.active == true
+        && data.servicioLabel == serviceData.bookingLabel
+        && (
+          (hasActiveDiscount(serviceData)
+            && data.servicioValor == serviceData.discountPriceLabel)
+          || (!hasActiveDiscount(serviceData)
+            && data.servicioValor == serviceData.priceLabel)
+        );
+    }
+
     function validService(data) {
-      return (data.servicio == "primera-consulta"
-          && data.servicioLabel == "Primera consulta"
-          && data.servicioValor == "$20.000")
-        || (data.servicio == "adulto-fonasa"
-          && data.servicioLabel == "Psicoterapia adulto - Fonasa A o B"
-          && data.servicioValor == "$20.000")
-        || (data.servicio == "adulto-particular"
-          && data.servicioLabel == "Psicoterapia adulto particular"
-          && data.servicioValor == "$40.000")
-        || (data.servicio == "infantojuvenil-fonasa"
-          && data.servicioLabel == "Psicoterapia infantojuvenil - Fonasa A o B"
-          && data.servicioValor == "$35.000")
-        || (data.servicio == "infantojuvenil-particular"
-          && data.servicioLabel == "Psicoterapia infantojuvenil particular"
-          && data.servicioValor == "$45.000")
-        || (data.servicio == "domicilio-infantil"
-          && data.servicioLabel == "Atención a domicilio infantil"
-          && data.servicioValor == "$50.000")
-        || (data.servicio == "wisc-v"
-          && data.servicioLabel == "Evaluación WISC-V"
-          && data.servicioValor == "$120.000");
+      return exists(/databases/$(database)/documents/services/$(data.servicio))
+        && validPublishedService(data);
+    }
+
+    function validServiceDocument(serviceId) {
+      let data = request.resource.data;
+      return data.keys().hasOnly([
+          "id",
+          "title",
+          "meta",
+          "description",
+          "bookingLabel",
+          "price",
+          "priceLabel",
+          "icon",
+          "order",
+          "active",
+          "discountEnabled",
+          "discountPrice",
+          "discountPriceLabel",
+          "discountEndsAt",
+          "createdAt",
+          "updatedAt"
+        ])
+        && data.keys().hasAll([
+          "id",
+          "title",
+          "meta",
+          "description",
+          "bookingLabel",
+          "price",
+          "priceLabel",
+          "icon",
+          "order",
+          "active",
+          "discountEnabled",
+          "discountPrice",
+          "discountPriceLabel",
+          "discountEndsAt",
+          "createdAt",
+          "updatedAt"
+        ])
+        && data.id == serviceId
+        && data.title is string
+        && data.title.size() >= 3
+        && data.title.size() <= 100
+        && data.meta is string
+        && data.meta.size() <= 60
+        && data.description is string
+        && data.description.size() >= 10
+        && data.description.size() <= 300
+        && data.bookingLabel is string
+        && data.bookingLabel.size() >= 3
+        && data.bookingLabel.size() <= 170
+        && data.price is int
+        && data.price >= 1000
+        && data.price <= 10000000
+        && data.priceLabel is string
+        && data.priceLabel.size() >= 2
+        && data.priceLabel.size() <= 30
+        && data.icon in [
+          "sparkles", "heart", "brain", "people", "child", "home", "clipboard",
+          "video", "calendar", "message", "support", "couple", "family", "shield",
+          "medical", "activity", "smile", "moon", "sun", "puzzle", "book",
+          "education", "nature"
+        ]
+        && data.order is int
+        && data.order >= 1
+        && data.order <= 999
+        && data.active is bool
+        && data.discountEnabled is bool
+        && data.discountPrice is int
+        && data.discountPrice >= 0
+        && data.discountPrice < data.price
+        && data.discountPriceLabel is string
+        && data.discountPriceLabel.size() >= 2
+        && data.discountPriceLabel.size() <= 30
+        && data.discountEndsAt is timestamp
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && (
+          data.discountEnabled == false
+          || (data.discountPrice > 0 && data.discountEndsAt > request.time)
+        );
     }
 
     function validSlotId(slotId, date, time) {
@@ -99,6 +181,15 @@ service cloud.firestore {
         && request.resource.data.telefono is string
         && request.resource.data.telefono.size() >= 8
         && request.resource.data.telefono.size() <= 30
+        && request.resource.data.servicio is string
+        && request.resource.data.servicio.size() >= 1
+        && request.resource.data.servicio.size() <= 128
+        && request.resource.data.servicioLabel is string
+        && request.resource.data.servicioLabel.size() >= 3
+        && request.resource.data.servicioLabel.size() <= 170
+        && request.resource.data.servicioValor is string
+        && request.resource.data.servicioValor.size() >= 2
+        && request.resource.data.servicioValor.size() <= 30
         && validService(request.resource.data)
         && request.resource.data.motivo is string
         && request.resource.data.motivo.size() <= 1500
@@ -159,6 +250,25 @@ service cloud.firestore {
       // Las reglas pueden consultarlo internamente para validar una reserva.
       allow read: if isAdmin();
       allow write: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validServiceDocument(serviceId);
+      allow delete: if isAdmin();
+    }
+
+    match /service_settings/{settingId} {
+      allow get: if settingId == "default";
+      allow list: if isAdmin();
+      allow create, update: if isAdmin()
+        && settingId == "default"
+        && request.resource.data.keys().hasOnly(["initialized", "version", "updatedAt"])
+        && request.resource.data.initialized == true
+        && request.resource.data.version is int
+        && request.resource.data.version >= 1
+        && request.resource.data.updatedAt is timestamp;
+      allow delete: if false;
     }
 
     match /patients/{document=**} {

@@ -91,6 +91,7 @@
 .admin-logout-action,
 .admin-menu-button,
 .admin-mobile-close,
+.admin-tour-button,
 .admin-primary-action {
   display: inline-flex;
   align-items: center;
@@ -102,6 +103,31 @@
   cursor: pointer;
   font: inherit;
   font-weight: 800;
+}
+
+.admin-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.admin-tour-button {
+  padding: 0 14px;
+  color: #694b32;
+  background: #fffaf5;
+  border: 1px solid #ddcbbd;
+}
+
+.admin-tour-button svg {
+  flex: 0 0 auto;
+  font-size: 1.35rem;
+}
+
+.admin-tour-button:hover {
+  color: #fff;
+  background: #8a5f36;
+  border-color: #8a5f36;
 }
 
 .admin-sidebar-toggle {
@@ -447,6 +473,14 @@
     width: 44px;
     padding: 0;
     font-size: 1.2rem;
+  }
+
+  .admin-topbar-actions {
+    gap: 6px;
+  }
+
+  .admin-tour-button {
+    padding: 0 12px;
   }
 }
 

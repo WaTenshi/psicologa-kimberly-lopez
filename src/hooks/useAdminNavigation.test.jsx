@@ -28,6 +28,7 @@ describe('useAdminNavigation', () => {
   it('normaliza paneles desconocidos al dashboard', () => {
     expect(normalizeAdminPanel('desconocido')).toBe('dashboard')
     expect(normalizeAdminPanel('patients')).toBe('patients')
+    expect(normalizeAdminPanel('services')).toBe('services')
   })
 
   it('actualiza la sección y la URL sin router externo', async () => {

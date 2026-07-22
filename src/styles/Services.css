@@ -28,6 +28,11 @@
   transition: var(--transition);
 }
 
+.service-card.has-offer {
+  border-color: rgba(181, 101, 58, 0.34);
+  box-shadow: 0 14px 36px rgba(181, 101, 58, 0.1);
+}
+
 .service-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-hover);
@@ -39,14 +44,37 @@
   justify-content: center;
   width: 54px;
   height: 54px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
   color: var(--primary-green);
   background: var(--very-light-green);
   border: 1px solid rgba(138, 95, 54, 0.14);
   border-radius: var(--radius);
 }
 
-.service-card > span {
+.service-card-topline {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.service-discount-badge {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 0 10px;
+  color: #9a3412;
+  background: #ffedd5;
+  border: 1px solid #fed7aa;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.service-card > .service-meta {
   margin-bottom: 10px;
   color: var(--terracotta);
   font-size: 0.78rem;
@@ -67,12 +95,63 @@
 
 .service-price {
   display: inline-flex;
-  margin-top: auto;
-  padding-top: 18px;
+  margin-top: 0;
+  padding-top: 0;
   color: var(--primary-green);
   font-family: var(--font-heading);
   font-size: 1.42rem;
   line-height: 1;
+}
+
+.service-price-block {
+  display: grid;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.service-price-block del {
+  color: #7d7066;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.service-price-block small {
+  color: #9a3412;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.services-empty-public {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 32px;
+  color: var(--primary-green);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.services-empty-public h3,
+.services-empty-public p {
+  margin: 0;
+}
+
+.service-card-skeleton {
+  min-height: 292px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.72) 25%, rgba(248, 238, 227, 0.94) 50%, rgba(255, 255, 255, 0.72) 75%);
+  background-size: 220% 100%;
+  animation: serviceSkeleton 1.4s ease-in-out infinite;
+}
+
+@keyframes serviceSkeleton {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
 }
 
 @media (max-width: 880px) {
@@ -88,5 +167,11 @@
 @media (max-width: 560px) {
   .services-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card-skeleton {
+    animation: none;
   }
 }

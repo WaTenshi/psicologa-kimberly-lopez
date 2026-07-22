@@ -4,6 +4,7 @@ export const ADMIN_PANEL_IDS = [
   'dashboard',
   'appointments',
   'availability',
+  'services',
   'patients',
   'sessions',
   'notes',

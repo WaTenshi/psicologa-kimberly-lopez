@@ -10,6 +10,7 @@ import SessionHistory from './SessionHistory'
 import QuickNotes from './QuickNotes'
 import DashboardAnalytics from './DashboardAnalytics'
 import AvailabilityManagement from './AvailabilityManagement'
+import ServiceManagement from './ServiceManagement'
 import AdminShell from './AdminShell'
 import { Drawer, PageHeader, SectionToolbar } from './AdminUI'
 import useAdminNavigation, { clearAdminPanelFromUrl } from '../hooks/useAdminNavigation'
@@ -80,6 +81,7 @@ export default function AdminDashboard({ onLogout }) {
   const [editingId, setEditingId] = useState(null)
   const [editingOriginalSlot, setEditingOriginalSlot] = useState(null)
   const [calendarRefreshKey, setCalendarRefreshKey] = useState(0)
+  const [serviceCreateRequest, setServiceCreateRequest] = useState(0)
 
   const [formData, setFormData] = useState(INITIAL_APPOINTMENT_FORM)
 
@@ -257,10 +259,11 @@ export default function AdminDashboard({ onLogout }) {
       contentRef={contentRef}
       onLogout={handleLogout}
       onNavigate={handlePanelNavigate}
-      primaryAction={['dashboard', 'appointments'].includes(mainTab) ? {
-        label: 'Nueva cita',
-        onClick: handleCreateAppointment,
-      } : null}
+      primaryAction={['dashboard', 'appointments'].includes(mainTab)
+        ? { label: 'Nueva cita', onClick: handleCreateAppointment }
+        : mainTab === 'services'
+          ? { label: 'Nuevo servicio', onClick: () => setServiceCreateRequest((request) => request + 1) }
+          : null}
       userEmail={auth.currentUser?.email}
     >
       {error && <div className="error-banner admin-global-error">{error}</div>}
@@ -627,6 +630,11 @@ export default function AdminDashboard({ onLogout }) {
       {/* Availability Section */}
       {mainTab === 'availability' && (
         <AvailabilityManagement />
+      )}
+
+      {/* Services Section */}
+      {mainTab === 'services' && (
+        <ServiceManagement createRequest={serviceCreateRequest} />
       )}
 
       {/* Patients Section */}

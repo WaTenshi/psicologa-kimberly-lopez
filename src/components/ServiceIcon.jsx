@@ -1,0 +1,56 @@
+import {
+  Activity,
+  Baby,
+  BookOpen,
+  Brain,
+  CalendarDays,
+  ClipboardCheck,
+  Flower2,
+  GraduationCap,
+  HandHeart,
+  HeartHandshake,
+  HeartPulse,
+  Home,
+  MessageCircle,
+  Moon,
+  Puzzle,
+  ShieldCheck,
+  Smile,
+  Sparkles,
+  Stethoscope,
+  Sun,
+  Users,
+  UsersRound,
+  Video,
+} from 'lucide-react'
+
+const SERVICE_ICONS = {
+  sparkles: Sparkles,
+  heart: HeartPulse,
+  brain: Brain,
+  people: UsersRound,
+  child: Baby,
+  home: Home,
+  clipboard: ClipboardCheck,
+  video: Video,
+  calendar: CalendarDays,
+  message: MessageCircle,
+  support: HandHeart,
+  couple: HeartHandshake,
+  family: Users,
+  shield: ShieldCheck,
+  medical: Stethoscope,
+  activity: Activity,
+  smile: Smile,
+  moon: Moon,
+  sun: Sun,
+  puzzle: Puzzle,
+  book: BookOpen,
+  education: GraduationCap,
+  nature: Flower2,
+}
+
+export default function ServiceIcon({ name, size = 24, ...props }) {
+  const Icon = SERVICE_ICONS[name] || Sparkles
+  return <Icon size={size} {...props} />
+}

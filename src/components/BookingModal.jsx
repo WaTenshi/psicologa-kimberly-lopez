@@ -17,6 +17,10 @@ import {
 } from 'lucide-react'
 import { db } from '../config/firebase'
 import {
+  formatServicePrice,
+  getEffectiveServicePrice,
+} from '../config/services'
+import {
   createDefaultAvailabilityConfig,
   formatDateKey,
   getAvailableSlotsForDate,
@@ -24,20 +28,17 @@ import {
 } from '../config/availability'
 import { loadAvailabilityConfig } from '../services/availabilityService'
 import { sendBookingEmails, saveBookingToFirestore } from '../services/emailService'
+import { subscribeToServiceCatalog } from '../services/serviceCatalogService'
 import '../styles/BookingModal.css'
 
-const serviceOptions = [
-  { value: 'primera-consulta', label: 'Primera consulta', price: '$20.000' },
-  { value: 'adulto-fonasa', label: 'Psicoterapia adulto - Fonasa A o B', price: '$20.000' },
-  { value: 'adulto-particular', label: 'Psicoterapia adulto particular', price: '$40.000' },
-  { value: 'infantojuvenil-fonasa', label: 'Psicoterapia infantojuvenil - Fonasa A o B', price: '$35.000' },
-  { value: 'infantojuvenil-particular', label: 'Psicoterapia infantojuvenil particular', price: '$45.000' },
-  { value: 'domicilio-infantil', label: 'Atención a domicilio infantil', price: '$50.000' },
-  { value: 'wisc-v', label: 'Evaluación WISC-V', price: '$120.000' },
-]
-
-const getSelectedService = (value) =>
-  serviceOptions.find((service) => service.value === value)
+const createServiceOptions = (services) => services
+  .filter((service) => service.active)
+  .map((service) => ({
+    value: service.id,
+    label: service.bookingLabel,
+    price: formatServicePrice(getEffectiveServicePrice(service)),
+    source: service,
+  }))
 
 const initialFormData = {
   nombre: '',
@@ -63,6 +64,8 @@ export default function BookingModal({ isOpen, onClose }) {
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0)
   const [availabilityConfig, setAvailabilityConfig] = useState(createDefaultAvailabilityConfig)
   const [loadingAvailability, setLoadingAvailability] = useState(true)
+  const [serviceOptions, setServiceOptions] = useState([])
+  const [loadingServices, setLoadingServices] = useState(true)
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -83,6 +86,20 @@ export default function BookingModal({ isOpen, onClose }) {
     return () => {
       active = false
     }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return undefined
+    return subscribeToServiceCatalog(
+      (catalog) => {
+        setServiceOptions(createServiceOptions(catalog))
+        setLoadingServices(false)
+      },
+      () => {
+        setServiceOptions([])
+        setLoadingServices(false)
+      },
+    )
   }, [isOpen])
 
   // Genera todos los días; la configuración decide cuáles se muestran cerrados.
@@ -112,7 +129,9 @@ export default function BookingModal({ isOpen, onClose }) {
     if (!formData.telefono.trim()) return setError('El teléfono es requerido'), false
     if (!formData.email.trim() || !formData.email.includes('@'))
       return setError('El correo electrónico es inválido'), false
-    if (!formData.servicio) return setError('Selecciona el tipo de servicio'), false
+    if (!formData.servicio || !serviceOptions.some((service) => service.value === formData.servicio)) {
+      return setError('Selecciona un servicio disponible'), false
+    }
     return true
   }
 
@@ -204,6 +223,9 @@ export default function BookingModal({ isOpen, onClose }) {
         day: 'numeric',
       })
 
+      const selectedService = serviceOptions.find((service) => service.value === formData.servicio)
+      if (!selectedService) throw new Error('El servicio seleccionado ya no está disponible.')
+
       const bookingData = {
         ...formData,
         nombre: formData.nombre.trim(),
@@ -212,8 +234,8 @@ export default function BookingModal({ isOpen, onClose }) {
         telefono: formData.telefono.trim(),
         email: formData.email.trim().toLowerCase(),
         motivo: formData.motivo.trim(),
-        servicioLabel: getSelectedService(formData.servicio)?.label || '',
-        servicioValor: getSelectedService(formData.servicio)?.price || '',
+        servicioLabel: selectedService.source.bookingLabel,
+        servicioValor: formatServicePrice(getEffectiveServicePrice(selectedService.source)),
         fecha: dateString,
         fechaFormato: dateFormatted,
         hora: selectedTime,
@@ -269,6 +291,7 @@ export default function BookingModal({ isOpen, onClose }) {
     setLoading(false)
     setLoadingSlots(false)
     setLoadingAvailability(true)
+    setLoadingServices(true)
   }
 
   const availableDates = getDaysFromNow(90)
@@ -431,7 +454,13 @@ export default function BookingModal({ isOpen, onClose }) {
                   value={formData.servicio}
                   onChange={handleFormChange}
                 >
-                  <option value="">Selecciona el servicio que necesitas</option>
+                  <option value="">
+                    {loadingServices
+                      ? 'Cargando servicios disponibles…'
+                      : serviceOptions.length > 0
+                      ? 'Selecciona el servicio que necesitas'
+                      : 'No hay servicios disponibles por ahora'}
+                  </option>
                   {serviceOptions.map((service) => (
                     <option key={service.value} value={service.value}>
                       {service.label} · {service.price}
@@ -455,9 +484,9 @@ export default function BookingModal({ isOpen, onClose }) {
               </div>
             </div>
 
-            <button className="booking-modal-btn-next" onClick={handleNextStep} disabled={loading || loadingAvailability}>
-              {loadingAvailability ? <Loader2 className="booking-modal-spinner" size={18} /> : <CalendarDays size={18} />}
-              {loadingAvailability ? 'Cargando agenda...' : 'Elegir fecha y hora'}
+            <button className="booking-modal-btn-next" onClick={handleNextStep} disabled={loading || loadingAvailability || loadingServices || serviceOptions.length === 0}>
+              {loadingAvailability || loadingServices ? <Loader2 className="booking-modal-spinner" size={18} /> : <CalendarDays size={18} />}
+              {loadingAvailability || loadingServices ? 'Cargando información...' : 'Elegir fecha y hora'}
             </button>
           </div>
         ) : (
