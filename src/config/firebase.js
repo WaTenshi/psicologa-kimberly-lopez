@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
+import { browserSessionPersistence, initializeAuth } from 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -22,6 +22,7 @@ if (missingConfig.length > 0) {
 
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
-const auth = getAuth(app)
+// Evita dejar una sesión administrativa persistente al cerrar el navegador.
+const auth = initializeAuth(app, { persistence: browserSessionPersistence })
 
 export { app, db, auth }

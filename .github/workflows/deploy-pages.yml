@@ -8,28 +8,55 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages-${{ github.ref }}
-  cancel-in-progress: true
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
           cache: npm
 
+      - name: Check tracked files for private secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          unexpected_env_files="$(git ls-files | grep -E '(^|/)\.env($|\.)' | grep -v '^\.env\.example$' || true)"
+          if [[ -n "$unexpected_env_files" ]]; then
+            echo "::error::Environment files must not be tracked."
+            printf '%s\n' "$unexpected_env_files"
+            exit 1
+          fi
+
+          private_secret_pattern='(-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9_]{30,}|github_pat_[A-Za-z0-9_]{50,}|sk-[A-Za-z0-9_-]{20,}|xox[baprs]-[A-Za-z0-9-]{10,})'
+          if git grep -n -I -E "$private_secret_pattern" -- ':!package-lock.json'; then
+            echo "::error::A value matching a private-secret pattern is tracked."
+            exit 1
+          fi
+
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+
+      - name: Lint
+        run: npm run lint
 
       - name: Build
         run: npm run build
@@ -46,66 +73,36 @@ jobs:
           VITE_EMAILJS_CLIENT_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_CLIENT_TEMPLATE_ID }}
           VITE_EMAILJS_THERAPIST_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_THERAPIST_TEMPLATE_ID }}
 
-      - name: Ensure secrets are not published
+      - name: Validate production artifact
         shell: bash
         run: |
           set -euo pipefail
-
-          secret_names=(
-            VITE_FIREBASE_API_KEY
-            VITE_FIREBASE_AUTH_DOMAIN
-            VITE_FIREBASE_PROJECT_ID
-            VITE_FIREBASE_STORAGE_BUCKET
-            VITE_FIREBASE_MESSAGING_SENDER_ID
-            VITE_FIREBASE_APP_ID
-            VITE_FIREBASE_MEASUREMENT_ID
-            VITE_EMAILJS_PUBLIC_KEY
-            VITE_EMAILJS_SERVICE_ID
-            VITE_EMAILJS_CLIENT_TEMPLATE_ID
-            VITE_EMAILJS_THERAPIST_TEMPLATE_ID
-          )
-
-          leaked=0
-          for name in "${secret_names[@]}"; do
-            value="${!name:-}"
-            if [[ -n "$value" ]] && grep -R -F -q -- "$value" dist; then
-              echo "::error::$name is present in the production artifact."
-              leaked=1
-            fi
-          done
-
-          if [[ "$leaked" -ne 0 ]]; then
-            echo "Deploy stopped because one or more configured secrets would be visible in GitHub Pages."
+          test -f dist/index.html
+          if find dist -type f \( -name '.env*' -o -name '*.map' -o -name '*.pem' -o -name '*.key' \) | grep -q .; then
+            echo "::error::The production artifact contains a forbidden file type."
             exit 1
           fi
-        env:
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
-          VITE_EMAILJS_PUBLIC_KEY: ${{ secrets.VITE_EMAILJS_PUBLIC_KEY }}
-          VITE_EMAILJS_SERVICE_ID: ${{ secrets.VITE_EMAILJS_SERVICE_ID }}
-          VITE_EMAILJS_CLIENT_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_CLIENT_TEMPLATE_ID }}
-          VITE_EMAILJS_THERAPIST_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_THERAPIST_TEMPLATE_ID }}
 
       - name: Configure Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
           path: ./dist
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

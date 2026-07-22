@@ -11,7 +11,43 @@ service cloud.firestore {
         ];
     }
 
-    function validPublicAppointment() {
+    function validService(data) {
+      return (data.servicio == "primera-consulta"
+          && data.servicioLabel == "Primera consulta"
+          && data.servicioValor == "$20.000")
+        || (data.servicio == "adulto-fonasa"
+          && data.servicioLabel == "Psicoterapia adulto - Fonasa A o B"
+          && data.servicioValor == "$20.000")
+        || (data.servicio == "adulto-particular"
+          && data.servicioLabel == "Psicoterapia adulto particular"
+          && data.servicioValor == "$40.000")
+        || (data.servicio == "infantojuvenil-fonasa"
+          && data.servicioLabel == "Psicoterapia infantojuvenil - Fonasa A o B"
+          && data.servicioValor == "$35.000")
+        || (data.servicio == "infantojuvenil-particular"
+          && data.servicioLabel == "Psicoterapia infantojuvenil particular"
+          && data.servicioValor == "$45.000")
+        || (data.servicio == "domicilio-infantil"
+          && data.servicioLabel == "Atención a domicilio infantil"
+          && data.servicioValor == "$50.000")
+        || (data.servicio == "wisc-v"
+          && data.servicioLabel == "Evaluación WISC-V"
+          && data.servicioValor == "$120.000");
+    }
+
+    function validSlotId(slotId, date, time) {
+      return (time == "09:00" && slotId == date + "_0900")
+        || (time == "10:00" && slotId == date + "_1000")
+        || (time == "11:00" && slotId == date + "_1100")
+        || (time == "12:00" && slotId == date + "_1200")
+        || (time == "13:00" && slotId == date + "_1300")
+        || (time == "18:00" && slotId == date + "_1800")
+        || (time == "19:00" && slotId == date + "_1900")
+        || (time == "20:00" && slotId == date + "_2000")
+        || (time == "21:00" && slotId == date + "_2100");
+    }
+
+    function validPublicAppointment(slotId) {
       return request.resource.data.keys().hasOnly([
           "nombre",
           "apellido",
@@ -34,29 +70,37 @@ service cloud.firestore {
         && request.resource.data.apellido is string
         && request.resource.data.apellido.size() >= 2
         && request.resource.data.apellido.size() <= 80
+        && request.resource.data.edad is int
+        && request.resource.data.edad >= 1
+        && request.resource.data.edad <= 120
+        && request.resource.data.rut is string
+        && request.resource.data.rut.size() >= 7
+        && request.resource.data.rut.size() <= 16
+        && request.resource.data.rut.matches('^[0-9.kK-]+$')
         && request.resource.data.email is string
+        && request.resource.data.email.size() >= 5
         && request.resource.data.email.size() <= 160
+        && request.resource.data.email.matches('^[^@ ]+@[^@ ]+\\.[^@ ]+$')
         && request.resource.data.telefono is string
+        && request.resource.data.telefono.size() >= 8
         && request.resource.data.telefono.size() <= 30
-        && request.resource.data.servicio is string
-        && request.resource.data.servicio.size() >= 1
-        && request.resource.data.servicio.size() <= 80
-        && request.resource.data.servicioLabel is string
-        && request.resource.data.servicioLabel.size() >= 1
-        && request.resource.data.servicioLabel.size() <= 120
-        && request.resource.data.servicioValor is string
-        && request.resource.data.servicioValor.size() >= 1
-        && request.resource.data.servicioValor.size() <= 30
+        && validService(request.resource.data)
         && request.resource.data.motivo is string
         && request.resource.data.motivo.size() <= 1500
         && request.resource.data.fecha is string
         && request.resource.data.fecha.size() == 10
+        && request.resource.data.fecha.matches('^20[0-9]{2}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])$')
         && request.resource.data.hora is string
         && request.resource.data.hora.size() == 5
-        && request.resource.data.estado == "confirmada";
+        && validSlotId(slotId, request.resource.data.fecha, request.resource.data.hora)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.estado == "confirmada"
+        && existsAfter(/databases/$(database)/documents/availability_blocks/$(slotId))
+        && getAfter(/databases/$(database)/documents/availability_blocks/$(slotId)).data.fecha == request.resource.data.fecha
+        && getAfter(/databases/$(database)/documents/availability_blocks/$(slotId)).data.hora == request.resource.data.hora;
     }
 
-    function validAvailabilityBlock() {
+    function validAvailabilityBlock(slotId) {
       return request.resource.data.keys().hasOnly([
           "fecha",
           "hora",
@@ -65,20 +109,26 @@ service cloud.firestore {
         ])
         && request.resource.data.fecha is string
         && request.resource.data.fecha.size() == 10
+        && request.resource.data.fecha.matches('^20[0-9]{2}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])$')
         && request.resource.data.hora is string
         && request.resource.data.hora.size() == 5
-        && request.resource.data.tipo == "sesion";
+        && validSlotId(slotId, request.resource.data.fecha, request.resource.data.hora)
+        && request.resource.data.tipo == "sesion"
+        && request.resource.data.createdAt == request.time
+        && existsAfter(/databases/$(database)/documents/appointments/$(slotId))
+        && getAfter(/databases/$(database)/documents/appointments/$(slotId)).data.fecha == request.resource.data.fecha
+        && getAfter(/databases/$(database)/documents/appointments/$(slotId)).data.hora == request.resource.data.hora;
     }
 
     match /availability_blocks/{slotId} {
       allow read: if true;
-      allow create: if isAdmin() || validAvailabilityBlock();
+      allow create: if isAdmin() || validAvailabilityBlock(slotId);
       allow update, delete: if isAdmin();
     }
 
     match /appointments/{appointmentId} {
       allow read, update, delete: if isAdmin();
-      allow create: if isAdmin() || validPublicAppointment();
+      allow create: if isAdmin() || validPublicAppointment(appointmentId);
     }
 
     match /patients/{document=**} {

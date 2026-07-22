@@ -11,35 +11,50 @@ const hasEmailConfig = () =>
   CLIENT_TEMPLATE_ID &&
   THERAPIST_TEMPLATE_ID
 
+const escapeEmailText = (value) =>
+  String(value ?? '').replace(/[<>&]/g, (character) => ({
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;',
+  })[character])
+
 // Correo al cliente confirmando su cita
 const sendClientEmail = (bookingData) => {
+  const safeName = escapeEmailText(bookingData.nombre)
+  const safeLastName = escapeEmailText(bookingData.apellido)
+  const safeDate = escapeEmailText(bookingData.fechaFormato)
+  const safeTime = escapeEmailText(bookingData.hora)
+  const safeService = escapeEmailText(bookingData.servicioLabel || 'No indicado')
   const params = {
     to_email: bookingData.email,
-    to_name: `${bookingData.nombre} ${bookingData.apellido}`,
+    to_name: `${safeName} ${safeLastName}`,
     subject: 'Confirmación de tu cita - Kimberly López Psicología',
-    message: `Hola ${bookingData.nombre}, tu cita ha sido confirmada para el ${bookingData.fechaFormato} a las ${bookingData.hora} hrs. Servicio: ${bookingData.servicioLabel || 'No indicado'}. Te esperamos. — Kimberly López`,
+    message: `Hola ${safeName}, tu cita ha sido confirmada para el ${safeDate} a las ${safeTime} hrs. Servicio: ${safeService}. Te esperamos. — Kimberly López`,
   }
   return emailjs.send(EMAILJS_SERVICE_ID, CLIENT_TEMPLATE_ID, params, EMAILJS_PUBLIC_KEY)
 }
 
 // Correo a la psicóloga notificando nueva reserva
 export const sendTherapistEmail = (bookingData) => {
+  const safe = Object.fromEntries(
+    Object.entries(bookingData).map(([key, value]) => [key, escapeEmailText(value)]),
+  )
   const params = {
     to_email: 'terapiaconkimberlylopez@gmail.com',
     to_name: 'Kimberly López',
     subject: 'Nueva reserva de cita',
     message:
       `Nueva cita agendada:\n\n` +
-      `Paciente: ${bookingData.nombre} ${bookingData.apellido}\n` +
-      `RUT: ${bookingData.rut}\n` +
-      `Edad: ${bookingData.edad}\n` +
-      `Teléfono: ${bookingData.telefono}\n` +
-      `Email: ${bookingData.email}\n` +
-      `Servicio: ${bookingData.servicioLabel || 'No indicado'}\n` +
-      `Valor: ${bookingData.servicioValor || 'No indicado'}\n` +
-      `Fecha: ${bookingData.fechaFormato}\n` +
-      `Hora: ${bookingData.hora} hrs\n` +
-      `Motivo: ${bookingData.motivo || 'No indicado'}`,
+      `Paciente: ${safe.nombre} ${safe.apellido}\n` +
+      `RUT: ${safe.rut}\n` +
+      `Edad: ${safe.edad}\n` +
+      `Teléfono: ${safe.telefono}\n` +
+      `Email: ${safe.email}\n` +
+      `Servicio: ${safe.servicioLabel || 'No indicado'}\n` +
+      `Valor: ${safe.servicioValor || 'No indicado'}\n` +
+      `Fecha: ${safe.fechaFormato}\n` +
+      `Hora: ${safe.hora} hrs\n` +
+      `Motivo: ${safe.motivo || 'No indicado'}`,
   }
   return emailjs.send(EMAILJS_SERVICE_ID, THERAPIST_TEMPLATE_ID, params, EMAILJS_PUBLIC_KEY)
 }

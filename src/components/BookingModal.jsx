@@ -182,6 +182,12 @@ export default function BookingModal({ isOpen, onClose }) {
 
       const bookingData = {
         ...formData,
+        nombre: formData.nombre.trim(),
+        apellido: formData.apellido.trim(),
+        rut: formData.rut.trim(),
+        telefono: formData.telefono.trim(),
+        email: formData.email.trim().toLowerCase(),
+        motivo: formData.motivo.trim(),
         servicioLabel: getSelectedService(formData.servicio)?.label || '',
         servicioValor: getSelectedService(formData.servicio)?.price || '',
         fecha: dateString,

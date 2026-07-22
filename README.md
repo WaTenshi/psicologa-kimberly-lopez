@@ -29,7 +29,7 @@ En GitHub debes:
 
 La URL esperada es:
 
-`https://watenshi.github.io/ps.kimberly/`
+`https://watenshi.github.io/psicologa-kimberly-lopez/`
 
 ## Firebase
 
@@ -50,7 +50,9 @@ Antes de activar estas reglas, sincroniza las citas antiguas creando un document
 - Las variables `VITE_*` no son secretos en tiempo de ejecución: una aplicación web debe enviarlas al navegador. GitHub Secrets evita que queden escritas en el código fuente, pero Firebase debe protegerse mediante reglas, dominios autorizados, cuotas y App Check.
 - Cambia inmediatamente cualquier contraseña administrativa que haya sido compartida o almacenada en texto plano.
 - Autoriza `watenshi.github.io` en Firebase Authentication y restringe la API key de Firebase a los dominios usados por el proyecto desde Google Cloud Console.
-- Configura restricciones de origen/dominio en EmailJS.
+- Configura `watenshi.github.io` en la allowlist de origen de EmailJS y activa reCAPTCHA en las plantillas públicas.
+- Activa App Check para Cloud Firestore en modo supervisión, verifica que el tráfico legítimo esté validado y después activa la aplicación obligatoria.
+- Los identificadores públicos del cliente aparecieron en commits históricos anteriores. Rótalos si deseas invalidar esas versiones y reescribe el historial solo después de coordinarlo con todos los clones del repositorio.
 
 Consulta también [SECURITY.md](SECURITY.md).
 
